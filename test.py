@@ -60,5 +60,29 @@ def visualize_test():
     animation.done()
 
 
-visualize_test()
+# visualize_test()
 #buildMagazin(15,15)
+
+
+def test_reading_warehouse_map(tmpdir):
+    """
+    Test if ``utils.read_warehouse_map`` works properly.
+    """
+    from utils import read_warehouse_map
+    content = """22223
+1a1b3
+1c1d3
+1e1f3
+14449
+"""
+    file_ = tmpdir.join("warehouse.map")
+    file_.write(content)
+    map_ = [
+        [2, 2, 2, 2, 3],
+        [1, "a", 1, "b", 3],
+        [1, "c", 1, "d", 3],
+        [1, "e", 1, "f", 3],
+        [1, 4, 4, 4, 9],
+    ]
+    array = read_warehouse_map(str(file_), use_numpy=False)
+    assert map_ == array
