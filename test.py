@@ -5,10 +5,10 @@ from visualize import *
 
 
 def build_magazine(width, height):
-  '''
-    builds simple magazin. There are no exit points, nor shelfs. 
-    These are to be implemented in the future
-  '''
+    """
+    Build simple magazin.  There are no exit points, nor shelfs.  These will be
+    implemented in the future.
+    """
     magazine = Magazine(width, height, [])
     magazine.getTile(0, 0).setDir(Direction(up=True))
     magazine.getTile(width-1, 0).setDir(Direction(left=True))
@@ -26,7 +26,8 @@ def build_magazine(width, height):
         for j in range(2, width-1, 3):
             magazine.getTile(j, i).setDir(Direction(right=True))
         for j in range(3, width-1, 3):
-            magazine.getTile(j, i).setDir(Direction(up=True, left=True, right=True))
+            magazine.getTile(j, i).setDir(Direction(up=True, left=True,
+                                                    right=True))
     return magazine
 
 

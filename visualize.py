@@ -1,6 +1,6 @@
 __author__ = 'wojciech'
 
-import math
+#import math
 import time
 
 from Tkinter import *
@@ -39,7 +39,7 @@ class RobotVisualization:
                 self.tiles[(i, j)] = \
                     self.w.create_rectangle(x1, y1,
                                             x2, y2,
-                                            fill = "gray")
+                                            fill="gray")
 
         # Draw grid lines
         for i in range(width + 1):
@@ -89,7 +89,7 @@ class RobotVisualization:
         x0, y0, = self._map_coords(x,y)
         direction = robot.getDir()
         if direction.getUp():
-            x1 = x0 + int (tile_size*0.4)
+            x1 = x0 + int(tile_size*0.4)
             y1 = y0 - int(tile_size*0.65)
             x2 = x0 + int(tile_size*0.6)
             y2 = y0 - int(tile_size*0.65)
@@ -101,7 +101,7 @@ class RobotVisualization:
     def _draw_robot_right(self, robot):
         x, y = robot.getPos().getX(), robot.getPos().getY()
         tile_size = self.windowSize/self.max_dim
-        x0, y0, = self._map_coords(x,y)
+        x0, y0, = self._map_coords(x, y)
         direction = robot.getDir()
         if direction.getRight():
             x1 = x0 + int(tile_size*0.73)
