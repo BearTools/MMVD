@@ -39,7 +39,7 @@ class RobotVisualization:
                 self.tiles[(i, j)] = \
                     self.w.create_rectangle(x1, y1,
                                             x2, y2,
-                                            fill="gray")
+                                            fill = "gray")
 
         # Draw grid lines
         for i in range(width + 1):
@@ -81,7 +81,7 @@ class RobotVisualization:
         tile_size = self.windowSize/self.max_dim
         x0, y0, = self._map_coords(x,y)
         return self.w.create_oval(x0 + int(tile_size*0.25), y0 - int(tile_size*0.25),
-                           x0 + int(tile_size*0.75), y0 - int(tile_size*0.75),fill="red")
+                                  x0 + int(tile_size*0.75), y0 - int(tile_size*0.75),fill="red")
 
     def _draw_robot_up(self, robot):
         x, y = robot.getPos().getX(), robot.getPos().getY()

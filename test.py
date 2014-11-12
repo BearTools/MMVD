@@ -6,8 +6,11 @@ from visualize import *
 
 def build_magazine(width, height):
     """
-    Build simple magazin.  There are no exit points, nor shelfs.  These will be
-    implemented in the future.
+    input width, height of magazine
+    output magazine object
+    Builds magazine with very simple topology.
+    There are roads that lead up for every shelf
+    exit points and shelfs will be implemented in the future
     """
     magazine = Magazine(width, height, [])
     magazine.getTile(0, 0).setDir(Direction(up=True))
@@ -36,7 +39,7 @@ def visualize_test():
     robot = Robot(pos, Direction())
     robot_list = []
     robot_list.append(robot)
-    magazine = build_magazine(15, 15)
+    magazine = build_magazine(15, 15) # build 15x15 magazine with simple rules
     magazine.addRobot(robot)
     animation = RobotVisualization(len(magazine.getRobots()),
                                    magazine.getWidth(),
@@ -60,9 +63,8 @@ def visualize_test():
     animation.done()
 
 
-# visualize_test()
+#visualize_test()
 #buildMagazin(15,15)
-
 
 def test_reading_warehouse_map(tmpdir):
     """
@@ -84,5 +86,8 @@ def test_reading_warehouse_map(tmpdir):
         [1, "e", 1, "f", 3],
         [1, 4, 4, 4, 9],
     ]
+    print map_
     array = read_warehouse_map(str(file_), use_numpy=False)
     assert map_ == array
+
+test_reading_warehouse_map("/wojciech/")
