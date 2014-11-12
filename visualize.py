@@ -8,7 +8,9 @@ from Tkinter import *
 
 class RobotVisualization:
     def __init__(self, num_robots, width, height, delay=0.2):
-        "Initializes a visualization with the specified parameters."
+        """
+        Initializes a visualization with the specified parameters.
+        """
         # Number of seconds to pause after each frame
         self.delay = delay
         self.windowSize = 600
@@ -39,7 +41,7 @@ class RobotVisualization:
                 self.tiles[(i, j)] = \
                     self.w.create_rectangle(x1, y1,
                                             x2, y2,
-                                            fill = "gray")
+                                            fill="gray")
 
         # Draw grid lines
         for i in range(width + 1):
@@ -60,14 +62,21 @@ class RobotVisualization:
         self.time = 0
         self.master.update()
 
-    def _status_string(self, time, num_clean_tiles):
-        "Returns an appropriate status string to print."
+    def _status_string(self, time_, num_clean_tiles):
+        """
+        :param time_:
+        :param num_clean_tiles:
+        :return:
+        Returns an appropriate status string to print.
+        """
         percent_clean = 100 * num_clean_tiles / (self.width * self.height)
         return "Time: %04d; %d tiles (%d%%) cleaned" % \
-            (time, num_clean_tiles, percent_clean)
+            (time_, num_clean_tiles, percent_clean)
 
     def _map_coords(self, x, y):
-        "Maps grid positions to window positions (in pixels)."
+        """
+        Maps grid positions to window positions (in pixels).
+        """
         return (self.windowSize/2 + 25 + self.windowSize * ((x - self.width / 2.0) / self.max_dim),
                 self.windowSize/2 + 25 + self.windowSize * ((self.height / 2.0 - y) / self.max_dim))
 
@@ -77,18 +86,18 @@ class RobotVisualization:
     # This way of adding elements allows to delete them from visualisation
     # There definitely is a better way of doing this.
     def _draw_robot(self, robot):
-        x, y = robot.getPos().getX(), robot.getPos().getY()
+        x, y = robot.get_pos().get_x(), robot.get_pos().get_y()
         tile_size = self.windowSize/self.max_dim
-        x0, y0, = self._map_coords(x,y)
+        x0, y0, = self._map_coords(x, y)
         return self.w.create_oval(x0 + int(tile_size*0.25), y0 - int(tile_size*0.25),
-                                  x0 + int(tile_size*0.75), y0 - int(tile_size*0.75),fill="red")
+                                  x0 + int(tile_size*0.75), y0 - int(tile_size*0.75), fill="red")
 
     def _draw_robot_up(self, robot):
-        x, y = robot.getPos().getX(), robot.getPos().getY()
+        x, y = robot.get_pos().get_x(), robot.get_pos().get_y()
         tile_size = self.windowSize/self.max_dim
-        x0, y0, = self._map_coords(x,y)
-        direction = robot.getDir()
-        if direction.getUp():
+        x0, y0, = self._map_coords(x, y)
+        direction = robot.get_dir()
+        if direction.get_up():
             x1 = x0 + int(tile_size*0.4)
             y1 = y0 - int(tile_size*0.65)
             x2 = x0 + int(tile_size*0.6)
@@ -99,11 +108,11 @@ class RobotVisualization:
                 x1, y1, x2, y2, x3, y3, fill="darkgreen")
 
     def _draw_robot_right(self, robot):
-        x, y = robot.getPos().getX(), robot.getPos().getY()
+        x, y = robot.get_pos().get_x(), robot.get_pos().get_y()
         tile_size = self.windowSize/self.max_dim
         x0, y0, = self._map_coords(x, y)
-        direction = robot.getDir()
-        if direction.getRight():
+        direction = robot.get_dir()
+        if direction.get_right():
             x1 = x0 + int(tile_size*0.73)
             y1 = y0 - int(tile_size*0.5)
             x2 = x0 + int(tile_size*0.65)
@@ -113,13 +122,12 @@ class RobotVisualization:
             return self.w.create_polygon(
                 x1, y1, x2, y2, x3, y3, fill="darkgreen")
 
-
     def _draw_robot_down(self, robot):
-        x, y = robot.getPos().getX(), robot.getPos().getY()
+        x, y = robot.get_pos().get_x(), robot.get_pos().get_y()
         tile_size = self.windowSize/self.max_dim
-        x0, y0, = self._map_coords(x,y)
-        direction = robot.getDir()
-        if direction.getDown():
+        x0, y0, = self._map_coords(x, y)
+        direction = robot.get_dir()
+        if direction.get_down():
 
             x1 = x0 + int(tile_size*0.4)
             y1 = y0 - int(tile_size*0.35)
@@ -131,11 +139,11 @@ class RobotVisualization:
                 x1, y1, x2, y2, x3, y3, fill="darkgreen")
 
     def _draw_robot_left(self, robot):
-        x, y = robot.getPos().getX(), robot.getPos().getY()
+        x, y = robot.get_pos().get_x(), robot.get_pos().get_y()
         tile_size = self.windowSize/self.max_dim
-        x0, y0, = self._map_coords(x,y)
-        direction = robot.getDir()
-        if direction.getLeft():
+        x0, y0, = self._map_coords(x, y)
+        direction = robot.get_dir()
+        if direction.get_left():
             x1 = x0 + int(tile_size*0.27)
             y1 = y0 - int(tile_size*0.5)
             x2 = x0 + int(tile_size*0.35)
@@ -150,8 +158,8 @@ class RobotVisualization:
     # This way of adding elements allows to delete them from visualisation
     # There definitely is a better way of doing this.
 
-    def _draw_dir_up(self, pos, up, size=0.3):
-        x, y = pos.getX(), pos.getY()
+    def _draw_dir_up(self, pos, up):
+        x, y = pos.get_x(), pos.get_y()
         tile_size = self.windowSize/self.max_dim
         x0, y0 = self._map_coords(x, y)
         if up:
@@ -165,7 +173,7 @@ class RobotVisualization:
                 x1, y1, x2, y2, x3, y3, fill="blue")
 
     def _draw_dir_right(self, pos, right):
-        x, y = pos.getX(), pos.getY()
+        x, y = pos.get_x(), pos.get_y()
         tile_size = self.windowSize/self.max_dim
         x0, y0 = self._map_coords(x, y)
         if right:
@@ -179,7 +187,7 @@ class RobotVisualization:
                 x1, y1, x2, y2, x3, y3, fill="blue")
 
     def _draw_dir_down(self, pos, down):
-        x, y = pos.getX(), pos.getY()
+        x, y = pos.get_x(), pos.get_y()
         tile_size = self.windowSize/self.max_dim
         x0, y0 = self._map_coords(x, y)
         if down:
@@ -193,7 +201,7 @@ class RobotVisualization:
                 x1, y1, x2, y2, x3, y3, fill="blue")
 
     def _draw_dir_left(self, pos, left):
-        x, y = pos.getX(), pos.getY()
+        x, y = pos.get_x(), pos.get_y()
         tile_size = self.windowSize/self.max_dim
         x0, y0 = self._map_coords(x, y)
         if left:
@@ -214,13 +222,13 @@ class RobotVisualization:
                 self.w.delete(robot)
                 self.master.update_idletasks()
         if self.robotsDirections:
-            for dir in self.robotsDirections:
-                self.w.delete(dir)
+            for dir_ in self.robotsDirections:
+                self.w.delete(dir_)
                 self.master.update_idletasks()
         if self.tilesDirections:
-            for dir in self.tilesDirections:
-                self.w.delete(dir)
-                self.master.update()
+            for dir_ in self.tilesDirections:
+                self.w.delete(dir_)
+                self.master.update_idletasks()
         # Draw new robots, directions
         self.robots = []
         self.robotsDirections = []
@@ -232,20 +240,20 @@ class RobotVisualization:
             self.robotsDirections.append(self._draw_robot_right(robot))
             self.robotsDirections.append(self._draw_robot_down(robot))
             self.robotsDirections.append(self._draw_robot_left(robot))
-        for i in range(room.getWidth()):
-            for j in range(room.getHeight()):
+        for i in range(room.get_width()):
+            for j in range(room.get_height()):
                 self.tilesDirections.append(self._draw_dir_up(
-                    room.tiles[i][j].getPos(),
-                    room.tiles[i][j].getDir().getUp()))
+                    room.tiles[i][j].get_pos(),
+                    room.tiles[i][j].get_dir().get_up()))
                 self.tilesDirections.append(self._draw_dir_right(
-                    room.tiles[i][j].getPos(),
-                    room.tiles[i][j].getDir().getRight()))
+                    room.tiles[i][j].get_pos(),
+                    room.tiles[i][j].get_dir().get_right()))
                 self.tilesDirections.append(self._draw_dir_down(
-                    room.tiles[i][j].getPos(),
-                    room.tiles[i][j].getDir().getDown()))
+                    room.tiles[i][j].get_pos(),
+                    room.tiles[i][j].get_dir().get_down()))
                 self.tilesDirections.append(self._draw_dir_left(
-                    room.tiles[i][j].getPos(),
-                    room.tiles[i][j].getDir().getLeft()))
+                    room.tiles[i][j].get_pos(),
+                    room.tiles[i][j].get_dir().get_left()))
 
         # Update text
         self.w.delete(self.text)

@@ -9,13 +9,13 @@ class Position(object):
         self.x = x
         self.y = y
 
-    def getX(self):
+    def get_x(self):
         return self.x
 
-    def getY(self):
+    def get_y(self):
         return self.y
 
-    def updatePosition(self):
+    def update_position(self):
         """
         It is used when robot tries to update its position.
         :return: returns new position after a clock tic
@@ -43,54 +43,57 @@ class Direction(object):
         self.down = down
         self.left = left
 
-    def getUp(self):
+    def get_up(self):
         return self.up
 
-    def setUp(self, up=True):
+    def set_up(self, up=True):
         self.up = up
 
-    def getRight(self):
+    def get_right(self):
         return self.right
 
-    def setRight(self, right=True):
+    def set_right(self, right=True):
         self.right = right
 
-    def getDown(self):
+    def get_down(self):
         return self.down
 
-    def setDown(self, down=True):
+    def set_down(self, down=True):
         self.down = down
 
-    def getLeft(self):
+    def get_left(self):
         return self.left
 
-    def setLeft(self, left=True):
+    def set_left(self, left=True):
         self.left = left
 
-    def getDirections(self):
-        "Return list of possible directions for a tile"
-        list = []
-        list.append(self.up)
-        list.append(self.right)
-        list.append(self.down)
-        list.append(self.left)
-        return list
+    def get_directions(self):
+        """
+        Return list of possible directions for a tile
+        """
+        list_ = []
+        list_.append(self.up)
+        list_.append(self.right)
+        list_.append(self.down)
+        list_.append(self.left)
+        return list_
 
-    def setDirections(self, up=False, right=False, down=False, left=False):
+    def set_directions(self, up=False, right=False, down=False, left=False):
         self.up = up
         self.right = right
         self.down = down
         self.left = left
 
     def __str__(self):
-        text = '{:6s}{:2s}{:5s}'.format('Up', ' : ', str(self.getUp()))
+        text = '{:6s}{:2s}{:5s}'.format('Up', ' : ', str(self.get_up()))
         text += '\n'
-        text += '{:6s}{:2s}{:5s}'.format('Right', ' : ', str(self.getRight()))
+        text += '{:6s}{:2s}{:5s}'.format('Right', ' : ', str(self.get_right()))
         text += '\n'
-        text += '{:6s}{:2s}{:5s}'.format('Down', ' : ', str(self.getDown()))
+        text += '{:6s}{:2s}{:5s}'.format('Down', ' : ', str(self.get_down()))
         text += '\n'
-        text += '{:6s}{:2s}{:5s}'.format('Left', ' : ', str(self.getLeft()))
+        text += '{:6s}{:2s}{:5s}'.format('Left', ' : ', str(self.get_left()))
         return text
+
 
 class Magazine(object):
     """
@@ -113,50 +116,49 @@ class Magazine(object):
     def __init__(self, width, height, robot_list):
         self.width = width
         self.height = height
-        self.tiles = [[Tile(Position(j,i),Direction()) for i in range(height)] for j in range(width)]
+        self.tiles = [[Tile(Position(j, i), Direction()) for i in range(height)] for j in range(width)]
         self.robot_list = robot_list
 
-    def getTileDirections(self, pos):
+    def get_tile_directions(self, pos):
         """
         :param pos: position of a tile
         :return: dir for tile at position pos
         """
-        return self.area[pos.getX()][pos.getY()].getDirections()
+        return self.tiles[pos.get_x()][pos.get_y()].get_dir()
 
-
-    def setTileDirection(self, pos, dir):
+    def set_tile_direction(self, pos, dir_):
         """
         sets dir to a tile at pos
         :param pos:
-        :param dir:
+        :param dir_:
         :return:
         """
-        self.area[pos.getX][pos.getY].setDirections(dir)
+        self.tiles[pos.get_x][pos.get_y].set_dir(dir_)
 
-    def getTile(self, x, y):
+    def get_tile(self, x, y):
         return self.tiles[x][y]
 
     def __str__(self):
         text = ''
         for i in range(self.width):
             for j in range(self.height):
-                text += str(self.area[i][j].getDirections())
+                text += str(self.tiles[i][j].get_dir())
             text += '\n'
         return text
 
-    def getRobots(self):
+    def get_robots(self):
         return self.robot_list
 
-    def addRobot(self, robot):
+    def add_robot(self, robot):
         self.robot_list.append(robot)
 
-    def setRobots(self, robot_list):
+    def set_robots(self, robot_list):
         self.robot_list = robot_list
 
-    def getWidth(self):
+    def get_width(self):
         return self.width
 
-    def getHeight(self):
+    def get_height(self):
         return self.height
 
 
@@ -175,42 +177,41 @@ class Robot(object):
         self.dir = _dir
         #self.shelf = shelf shelf not implemented
 
-    def setPos(self, pos):
+    def set_pos(self, pos):
         self.pos = pos
 
-    def getPos(self):
+    def get_pos(self):
         return self.pos
 
-    def setDir(self, dir):
-        self.dir = dir
+    def set_dir(self, dir_):
+        self.dir = dir_
 
-    def getDir(self):
+    def get_dir(self):
         return self.dir
 
     def __str__(self):
-        return str(self.pos) + '\n' +  str(self.dir)
-
+        return str(self.pos) + '\n' + str(self.dir)
 
 
 class Tile(object):
     """
     Single tile in the magazine. Has position, and possible direction.
     """
-    def __init__(self, pos, dir):
+    def __init__(self, pos, dir_):
         self.pos = pos
-        self.dir = dir
+        self.dir = dir_
 
-    def getPos(self):
-        return  self.pos
+    def get_pos(self):
+        return self.pos
 
-    def getDir(self):
+    def get_dir(self):
         return self.dir
 
-    def setPos(self,pos):
+    def set_pos(self, pos):
         self.pos = pos
 
-    def setDir(self, dir):
-        self.dir = dir
+    def set_dir(self, dir_):
+        self.dir = dir_
 
 
 class Shelf(object):
