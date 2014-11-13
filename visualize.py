@@ -11,7 +11,7 @@ class RobotVisualization:
     Visualization of magazine. Shows view of magazine from above.
 
     """
-    def __init__(self, num_robots, width, height, delay=0.2):
+    def __init__(self,  width, height, delay=0.5):
         """
         Initializes a visualization with the specified parameters.
 
@@ -23,7 +23,6 @@ class RobotVisualization:
         self.max_dim = max(width, height)
         self.width = width
         self.height = height
-        self.num_robots = num_robots
 
         # Initialize a drawing surface
         self.master = Tk()
@@ -61,28 +60,29 @@ class RobotVisualization:
         self.robots = None
         self.robotsDirections = None
         self.tilesDirections = None
+        self.exit_points = None
+        self.shelfs = None
+        self.shelfs_names = None
         self.text = self.w.create_text(25, 0, anchor=NW,
-                                       text=self._status_string(0, 0))
+                                       text=self._status_string(0))
         self.time = 0
         self.master.update()
 
-    def _status_string(self, time_, num_clean_tiles):
+    def _status_string(self, time_):
         """
-        :param time_:
-        :param num_clean_tiles:
-        :return:
-        Returns an appropriate status string to print.
+        Prints current time at the top
         """
-        percent_clean = 100 * num_clean_tiles / (self.width * self.height)
-        return "Time: %04d; %d tiles (%d%%) cleaned" % \
-            (time_, num_clean_tiles, percent_clean)
+        return "Time: %04d; " % \
+            time_
 
     def _map_coords(self, x, y):
         """
         Maps grid positions to window positions (in pixels).
         """
-        return (self.windowSize/2 + 25 + self.windowSize * ((x - self.width / 2.0) / self.max_dim),
-                self.windowSize/2 + 25 + self.windowSize * ((self.height / 2.0 - y) / self.max_dim))
+        return (self.windowSize/2 + 25 + self.windowSize *
+                ((x - self.width / 2.0) / self.max_dim),
+                self.windowSize/2 + 25 + self.windowSize *
+                ((self.height / 2.0 - y) / self.max_dim))
 
 # -----------------------------------------------------------------
     # set of functions to update all robots in the area with all directions
@@ -93,8 +93,11 @@ class RobotVisualization:
         x, y = robot.get_x(), robot.get_y()
         tile_size = self.windowSize/self.max_dim
         x0, y0, = self._map_coords(x, y)
-        return self.w.create_oval(x0 + int(tile_size*0.25), y0 - int(tile_size*0.25),
-                                  x0 + int(tile_size*0.75), y0 - int(tile_size*0.75), fill="red")
+        return self.w.create_oval(x0 + int(tile_size*0.25),
+                                  y0 - int(tile_size*0.25),
+                                  x0 + int(tile_size*0.75),
+                                  y0 - int(tile_size*0.75),
+                                  fill="red")
 
     def _draw_robot_up(self, robot):
         x, y = robot.get_x(), robot.get_y()
@@ -132,7 +135,6 @@ class RobotVisualization:
         x0, y0, = self._map_coords(x, y)
         direction = robot.get_direction()
         if direction.get_down():
-
             x1 = x0 + int(tile_size*0.4)
             y1 = y0 - int(tile_size*0.35)
             x2 = x0 + int(tile_size*0.6)
@@ -214,26 +216,94 @@ class RobotVisualization:
             return self.w.create_polygon(
                 x1, y1, x2, y2, x3, y3, fill="blue")
 
+    def _draw_exit_point(self, x, y):
+        """
+        Draws exit_point as black square on top of
+        """
+        tile_size = self.windowSize/self.max_dim
+        x0, y0 = self._map_coords(x, y)
+        return self.w.create_rectangle(x0 + tile_size * 0.2,
+                                       y0 - tile_size * 0.2,
+                                       x0 + tile_size * 0.8,
+                                       y0 - tile_size * 0.8,
+                                       fill="purple")
+    def _draw_shelf(self, x, y):
+        """
+        Draw shelf as small rectangle with character on top of it
+        Characters should be unique in order to recognize
+        what is going on during simulation
+        """
+        tile_size = self.windowSize/self.max_dim
+        x0, y0 = self._map_coords(x, y)
+        return self.w.create_rectangle(x0 + tile_size * 0.3,
+                                       y0 - tile_size * 0.3,
+                                       x0 + tile_size * 0.7,
+                                       y0 - tile_size * 0.7,
+                                       fill="orange")
+
+    def _draw_shelf_name(self, x, y, name):
+        tile_size = self.windowSize/self.max_dim
+        x0, y0 = self._map_coords(x, y)
+        return self.w.create_text(x0 + tile_size*0.4,
+                                  y0 - tile_size*0.6,
+                                  anchor=NW,
+                                  text=name)
+
     def update(self, room, robots):
+        # Redraw all elements in magazine that can move
+        # Does not take into account that most of things
+        # does not move at all
+        # CAUTION!
+        #     there is a bug!
+        #     when exit point or shelf is added
+        #     the direction is not deleted
+        # FIXED
+        # Preferred behaviour:
+        # (1) Redraw only those elements that changed position
+        # (2) make robots move smoothly
+        # (3) make it pretty
 
         # Delete all existing robots.
         if self.robots:
             for robot in self.robots:
                 self.w.delete(robot)
                 self.master.update_idletasks()
+        # Delete all existing robotDirections
         if self.robotsDirections:
             for dir_ in self.robotsDirections:
                 self.w.delete(dir_)
                 self.master.update_idletasks()
+        # Delete all existing main roads
         if self.tilesDirections:
             for dir_ in self.tilesDirections:
                 self.w.delete(dir_)
                 self.master.update_idletasks()
-        # Draw new robots, directions
+        # Delete all exit points
+        if self.exit_points:
+            for exit_point in self.exit_points:
+                self.w.delete(exit_point)
+                self.master.update_idletasks()
+        # Delete all shelfs
+        if self.shelfs:
+            for shelf in self.shelfs:
+                self.w.delete(shelf)
+                self.master.update_idletasks()
+        # Delete all shelfs_names
+        if self.shelfs_names:
+            for name in self.shelfs_names:
+                self.w.delete(name)
+                self.w.update_idletasks()
 
         self.robots = []
         self.robotsDirections = []
         self.tilesDirections = []
+        self.exit_points = []
+        self.shelfs = []
+        self.shelfs_names = []
+
+        for exit_point in room.get_exit_points():
+            self.exit_points.append(self._draw_exit_point(exit_point[0],
+                                                          exit_point[1]))
         for robot in robots:
             self.robots.append(
                 self._draw_robot(robot))
@@ -241,31 +311,43 @@ class RobotVisualization:
             self.robotsDirections.append(self._draw_robot_right(robot))
             self.robotsDirections.append(self._draw_robot_down(robot))
             self.robotsDirections.append(self._draw_robot_left(robot))
+
         for i in range(room.get_width()):
             for j in range(room.get_height()):
-                self.tilesDirections.append(self._draw_dir_up(
-                    room.tiles[i][j].get_x(),
-                    room.tiles[i][j].get_y(),
-                    room.tiles[i][j].get_direction().get_up()))
-                self.tilesDirections.append(self._draw_dir_right(
-                    room.tiles[i][j].get_x(),
-                    room.tiles[i][j].get_y(),
-                    room.tiles[i][j].get_direction().get_right()))
-                self.tilesDirections.append(self._draw_dir_down(
-                    room.tiles[i][j].get_x(),
-                    room.tiles[i][j].get_y(),
-                    room.tiles[i][j].get_direction().get_down()))
-                self.tilesDirections.append(self._draw_dir_left(
-                    room.tiles[i][j].get_x(),
-                    room.tiles[i][j].get_y(),
-                    room.tiles[i][j].get_direction().get_left()))
+                if room.tiles[i][j].get_direction().get_up():
+                    self.tilesDirections.append(self._draw_dir_up(
+                        room.tiles[i][j].get_x(),
+                        room.tiles[i][j].get_y(),
+                        room.tiles[i][j].get_direction().get_up()))
+                if room.tiles[i][j].get_direction().get_right():
+                    self.tilesDirections.append(self._draw_dir_right(
+                        room.tiles[i][j].get_x(),
+                        room.tiles[i][j].get_y(),
+                        room.tiles[i][j].get_direction().get_right()))
+                if room.tiles[i][j].get_direction().get_down():
+                    self.tilesDirections.append(self._draw_dir_down(
+                        room.tiles[i][j].get_x(),
+                        room.tiles[i][j].get_y(),
+                        room.tiles[i][j].get_direction().get_down()))
+                if room.tiles[i][j].get_direction().get_left():
+                    self.tilesDirections.append(self._draw_dir_left(
+                        room.tiles[i][j].get_x(),
+                        room.tiles[i][j].get_y(),
+                        room.tiles[i][j].get_direction().get_left()))
+
+        for shelf in room.get_shelf_list():
+            self.shelfs.append(self._draw_shelf(shelf.get_x(),
+                                                shelf.get_y()))
+            self.shelfs_names.append(self._draw_shelf_name(shelf.get_x(),
+                                                           shelf.get_y(),
+                                                           shelf.get_name()))
 
         # Update text
         self.w.delete(self.text)
         self.time += 1
         self.text = self.w.create_text(
             25, 0, anchor=NW,
-            text=self._status_string(self.time, 20))
+            text=self._status_string(self.time))
         self.master.update()
         time.sleep(self.delay)
 

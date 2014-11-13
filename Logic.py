@@ -109,6 +109,7 @@ class Magazine(object):
         self.robot_list = []
         self.shelf_list = []
         self.visualize = RobotVisualization
+        self.exit_points = []
 
     def add_robot(self, robot):
         self.robot_list.append(robot)
@@ -121,22 +122,36 @@ class Magazine(object):
         Very important function!
         Creates magazine based on content of array
         """
-
+        self.exit_points=[]
+        self.shelf_list = []
         for i in range(len(array)):
             #print i
             for j in range(len(array[i])):
                 # print array[i][j],
                 if array[i][j] == 1:
                     self.get_tile(j, len(array)-i-1).set_direction(Direction(up=True))
+                    continue
                 if array[i][j] == 2:
                     self.get_tile(j, len(array)-i-1).set_direction(Direction(right=True))
+                    continue
                 if array[i][j] == 3:
                     self.get_tile(j, len(array)-i-1).set_direction(Direction(down=True))
+                    continue
                 if array[i][j] == 4:
                     self.get_tile(j, len(array)-i-1).set_direction(Direction(left=True))
+                    continue
+                if array[i][j] == 9:
+                    self.exit_points.append((j, len(array)-i-1))
+                    self.get_tile(j, len(array)-1-i).set_direction(Direction())
+                    continue
+                else:
+
+                    self.shelf_list.append(Shelf(j, len(array)-1-i, array[i][j]))
+                    self.get_tile(j, len(array)-1-i).set_direction(Direction())
+                    continue
 
     def show(self):
-        self.visualize = RobotVisualization(len(self.get_robot_list()),self.get_width(),self.get_height())
+        self.visualize = RobotVisualization(self.get_width(),self.get_height())
         self.visualize.update(self, self.get_robot_list())
 
     def update(self, array):
@@ -145,6 +160,9 @@ class Magazine(object):
 
     def end(self):
         self.visualize.done()
+
+    def get_exit_points(self):
+        return self.exit_points
 
     def get_height(self):
         return self.height
@@ -244,10 +262,29 @@ class Shelf(object):
     """
     Represents shelf. Keeps track of what is in the shelf as well as keeps
     current position.
-    Knows its default/initial position in magazine.
-    item_list - list of all products that are in the shelf
+    Knows its position in magazine.
+    Name has to be unique for each shelf
+    Name is to be displayed when animation runs
     """
     def __init__(self, x, y, name):
         self.x = x
         self.y = y
         self.name = name
+
+    def get_name(self):
+        return self.name
+
+    def get_x(self):
+        return self.x
+
+    def get_y(self):
+        return self.y
+
+    def set_name(self, name):
+        self.name = name
+
+    def set_x(self, x):
+        self.x = x
+
+    def set_y(self, y):
+        self.y = y
