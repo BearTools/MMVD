@@ -129,11 +129,11 @@ def heuristic(map_, start_position, end_position):
     """
     A helper heuristic function.
     Return value indicating cost of going from start_position to end_position.
-    Computes Cartesian distance between two points.
+    Computes Manhattan distance between two points.
     """
     x1, y1 = start_position
     x2, y2 = end_position
-    return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+    return abs(x1 - x2) + abs(y1 - y2)
 
 
 def shortest_path(map_, start_position, end_position):
