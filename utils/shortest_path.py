@@ -1,41 +1,14 @@
 # coding: utf-8
-import numpy as np
 import heapq
+# from .memoize import memoize  # it's so shitty!
 
 
-def read_warehouse_map(name, use_numpy=False):
-    """
-    Read the file line by line and represent it as an array or list of lists.
-    """
-    with open(name, 'r') as f:
-        lines = f.readlines()
-    lines = map(lambda x: x.rstrip(), lines)  # get rid of line endings
-    lines = filter(len, lines)  # get rid of empty lines
-    lines = map(list, lines)  # split each line into list (ie. mutable string)
-
-    # change '0' to '9' into integers 0-9
-    for k1, v1 in enumerate(lines):
-        for k2, v2 in enumerate(v1):
-            try:
-                v2_ = int(v2)
-            except ValueError:
-                v2_ = v2
-            lines[k1][k2] = v2_
-
-    if use_numpy:
-        # CAUTION: Numpy arrays don't support mixed ints and chars, there's
-        #          gonna be all characters.
-        lines = np.array(lines)
-
-    return lines
-
-
-class CannotFindPath(Exception):
+class PathUnreachable(Exception):
     """
     Path-finding algorithm raises this exception in case of failure in finding
     path to the destination.
     """
-    message = "Couldn't find a route to the destination."
+    message = "Cannot find route to the destination."
 
 
 def neighbors(map_, position, available_only=False, positions=True):
@@ -43,10 +16,11 @@ def neighbors(map_, position, available_only=False, positions=True):
     Return Von Neumann neighborhood of distance r=1.
 
     :param array map_: a warehouse map
-    :param pair position: a `(x, y)` of current position on the map
+    :param pair position: a ``(x, y)`` of current position on the map
     :param bool available_only: return only available moves (according to the
                                 traffic rules)
-    :param bool positions: return pairs `(x, y)` instead of values `map_[y][x]`
+    :param bool positions: return pairs ``(x, y)`` instead of values
+                           ``map_[y][x]``
     """
     x, y = position
 
@@ -69,6 +43,8 @@ def neighbors(map_, position, available_only=False, positions=True):
 
     results = [[True, up], [True, right], [True, down], [True, left]]
 
+    # below this point: implementation of right-hand traffic rules
+
     # rules according to right-hand traffic (suck it, Britain!)
     # 1. can't go in opposite (180°) direction
     # 2. can't turn left
@@ -79,6 +55,7 @@ def neighbors(map_, position, available_only=False, positions=True):
         4: (4, 1)
     }
 
+    # checking if neighbors comply with traffic rules
     if available_only:
         # set to False these pairs that point in the forbidden direction
         current = map_[y][x]
@@ -111,10 +88,34 @@ def neighbors(map_, position, available_only=False, positions=True):
     return tuple(map(lambda x: x[1], filter(lambda x: x[0], results)))
 
 
+def manhattan_dist(map_, start_position, end_position):
+    """
+    Compute Manhattan distance between two points on the same map.
+    Return value indicating cost of going from start_position to end_position.
+
+    :param array map_: a warehouse map
+    :param pair start_position: a ``(x, y)`` of current position on the map
+    :param pair end_position: a ``(x, y)`` of final position on the map
+    :return: Manhattan distance between ``start_position`` and ``end_position``
+    :rtype: int
+    """
+    x1, y1 = start_position
+    x2, y2 = end_position
+    return abs(x1 - x2) + abs(y1 - y2)
+
+
 def build_path(start, finish, parent):
     """
+    Contruct a route from A* algorithms "backwards".
+
     Adapted from:
     http://dave.dkjones.org/posts/2012/2012-03-12-astar-python.html
+
+    :param pair start: a ``(x, y)`` of starting position on the map
+    :param pair finish: a ``(x, y)`` of finish position on the map
+    :param dict parent: a dictionary full of node=>parent mappings
+    :return: chronological list of visited nodes, e.g.
+             ``[(0, 0), (0, 1), ..., (2, 4)]``
     """
     x = finish
     xs = [x]
@@ -125,23 +126,20 @@ def build_path(start, finish, parent):
     return xs
 
 
-def heuristic(map_, start_position, end_position):
-    """
-    A helper heuristic function.
-    Return value indicating cost of going from start_position to end_position.
-    Computes Manhattan distance between two points.
-    """
-    x1, y1 = start_position
-    x2, y2 = end_position
-    return abs(x1 - x2) + abs(y1 - y2)
-
-
-def shortest_path(map_, start_position, end_position):
+def a_star(map_, start_position, end_position):
     """
     Find shortest path from ``start_position`` to ``end_position`` on the
-    ``map_``.
+    ``map_`` using A* (http://en.wikipedia.org/wiki/A*) algorithm.
+
     Adapted from:
     http://dave.dkjones.org/posts/2012/2012-03-12-astar-python.html
+
+    :param array map_: warehouse map
+    :param pair start_position: a ``(x, y)`` of current position on the map
+    :param pair end_position: a ``(x, y)`` of final position on the map
+    :return: distance, iteration steps and actual path to the destination
+    :raises PathUnreachable: if the algorithm is not able to find a path to the
+                             destination
     """
     heap = []
 
@@ -160,7 +158,7 @@ def shortest_path(map_, start_position, end_position):
         f, junk, current = heapq.heappop(heap)
 
         if current == end_position:
-            print "distance:", g[current], "steps:", step
+            print "Distance: {}, steps: {}".format(g[current], step)
             return g[current], step, build_path(start_position, end_position,
                                                 link)
 
@@ -172,8 +170,8 @@ def shortest_path(map_, start_position, end_position):
             if move not in g or g[move] > distance + 1:
                 g[move] = distance + 1
                 if move not in h:
-                    h[move] = heuristic(map_, move, end_position)
+                    h[move] = manhattan_dist(map_, move, end_position)
                 link[move] = current
                 heapq.heappush(heap, (g[move] + h[move], -step, move))
     else:
-        raise CannotFindPath()
+        raise PathUnreachable()

@@ -1,13 +1,12 @@
-__author__ = 'wojciech'
-
-from Logic import *
-from visualize import *
-from utils import *
-
 import pytest
+
 from utils import read_warehouse_map
 from utils import neighbors
-from utils import shortest_path
+from utils import a_star as shortest_path
+
+from logic import Direction
+from logic import Robot
+from logic import Magazine
 
 
 @pytest.fixture
@@ -23,6 +22,7 @@ def warehouse_map1(tmpdir):
     return read_warehouse_map(str(file_), use_numpy=False)
 
 
+@pytest.mark.frontend
 def test_direction_class():
     direction = Direction()
     assert direction.get_up() is False
@@ -33,10 +33,11 @@ def test_direction_class():
     assert direction.get_direction_list() == [True, False, True, False]
 
 
+@pytest.mark.frontend
 def test_robot_class():
     robot = Robot()
-    assert robot.get_direction().get_direction_list() == [False, False, False,
-                                                          False]
+    direction_list = robot.get_direction().get_direction_list()
+    assert direction_list == [False, False, False, False]
     robot.set_y(4)
     assert robot.get_y() == 4
     robot.set_direction(Direction(up=True, left=True))
@@ -44,6 +45,7 @@ def test_robot_class():
                                                           True]
 
 
+@pytest.mark.frontend
 def test_magazine_class():
     magazine = Magazine(5, 6)
     magazine.show()
@@ -85,6 +87,7 @@ def test_magazine_class():
     magazine.end()
 
 
+@pytest.mark.utils
 def test_reading_warehouse_map(warehouse_map1):
     """
     Test if ``utils.read_warehouse_map`` works properly.
@@ -99,6 +102,7 @@ def test_reading_warehouse_map(warehouse_map1):
     assert map_ == warehouse_map1
 
 
+@pytest.mark.utils
 def test_neighbors(warehouse_map1):
     position = (0, 0)
     assert (0, 2, 1, 0) == neighbors(warehouse_map1, position,
@@ -109,9 +113,11 @@ def test_neighbors(warehouse_map1):
     position = (1, 1)
     assert (2, 1, 'c', 1) == neighbors(warehouse_map1, position,
                                        available_only=False, positions=False)
+
     # this test is ridiculous (doesn't make any sense), but I do it anyway
     assert (2, 1, 1) == neighbors(warehouse_map1, position,
                                   available_only=True, positions=False)
+
     assert ((1, 0), (2, 1), (0, 1)) == neighbors(warehouse_map1, position,
                                                  available_only=True,
                                                  positions=True)
@@ -125,6 +131,7 @@ def test_neighbors(warehouse_map1):
                                   available_only=True, positions=True)
 
 
+@pytest.mark.utils
 def test_a_star(warehouse_map1):
     """
     Test accuracy and correctness of the A* algorithm.
@@ -135,3 +142,8 @@ def test_a_star(warehouse_map1):
     assert length == 8
     assert path == [(4, 4), (3, 4), (2, 4), (1, 4), (0, 4), (0, 3), (0, 2),
                     (0, 1), (0, 0)]
+
+    start = (0, 0)
+    end = (2, 1)
+    length, iterations, path = shortest_path(warehouse_map1, start, end)
+    assert length == 13
