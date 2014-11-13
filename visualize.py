@@ -7,9 +7,14 @@ from Tkinter import *
 
 
 class RobotVisualization:
+    """
+    Visualization of magazine. Shows view of magazine from above.
+
+    """
     def __init__(self, num_robots, width, height, delay=0.2):
         """
         Initializes a visualization with the specified parameters.
+
         """
         # Number of seconds to pause after each frame
         self.delay = delay
@@ -86,14 +91,14 @@ class RobotVisualization:
     # This way of adding elements allows to delete them from visualisation
     # There definitely is a better way of doing this.
     def _draw_robot(self, robot):
-        x, y = robot.get_pos().get_x(), robot.get_pos().get_y()
+        x, y = robot.get_x(), robot.get_y()
         tile_size = self.windowSize/self.max_dim
         x0, y0, = self._map_coords(x, y)
         return self.w.create_oval(x0 + int(tile_size*0.25), y0 - int(tile_size*0.25),
                                   x0 + int(tile_size*0.75), y0 - int(tile_size*0.75), fill="red")
 
     def _draw_robot_up(self, robot):
-        x, y = robot.get_pos().get_x(), robot.get_pos().get_y()
+        x, y = robot.get_x(), robot.get_y()
         tile_size = self.windowSize/self.max_dim
         x0, y0, = self._map_coords(x, y)
         direction = robot.get_dir()
@@ -108,7 +113,7 @@ class RobotVisualization:
                 x1, y1, x2, y2, x3, y3, fill="darkgreen")
 
     def _draw_robot_right(self, robot):
-        x, y = robot.get_pos().get_x(), robot.get_pos().get_y()
+        x, y = robot.get_x(), robot.get_y()
         tile_size = self.windowSize/self.max_dim
         x0, y0, = self._map_coords(x, y)
         direction = robot.get_dir()
@@ -123,7 +128,7 @@ class RobotVisualization:
                 x1, y1, x2, y2, x3, y3, fill="darkgreen")
 
     def _draw_robot_down(self, robot):
-        x, y = robot.get_pos().get_x(), robot.get_pos().get_y()
+        x, y = robot.get_x(), robot.get_y()
         tile_size = self.windowSize/self.max_dim
         x0, y0, = self._map_coords(x, y)
         direction = robot.get_dir()
@@ -139,7 +144,7 @@ class RobotVisualization:
                 x1, y1, x2, y2, x3, y3, fill="darkgreen")
 
     def _draw_robot_left(self, robot):
-        x, y = robot.get_pos().get_x(), robot.get_pos().get_y()
+        x, y = robot.get_x(), robot.get_y()
         tile_size = self.windowSize/self.max_dim
         x0, y0, = self._map_coords(x, y)
         direction = robot.get_dir()
@@ -158,8 +163,7 @@ class RobotVisualization:
     # This way of adding elements allows to delete them from visualisation
     # There definitely is a better way of doing this.
 
-    def _draw_dir_up(self, pos, up):
-        x, y = pos.get_x(), pos.get_y()
+    def _draw_dir_up(self, x, y, up):
         tile_size = self.windowSize/self.max_dim
         x0, y0 = self._map_coords(x, y)
         if up:
@@ -172,8 +176,7 @@ class RobotVisualization:
             return self.w.create_polygon(
                 x1, y1, x2, y2, x3, y3, fill="blue")
 
-    def _draw_dir_right(self, pos, right):
-        x, y = pos.get_x(), pos.get_y()
+    def _draw_dir_right(self, x, y, right):
         tile_size = self.windowSize/self.max_dim
         x0, y0 = self._map_coords(x, y)
         if right:
@@ -186,8 +189,7 @@ class RobotVisualization:
             return self.w.create_polygon(
                 x1, y1, x2, y2, x3, y3, fill="blue")
 
-    def _draw_dir_down(self, pos, down):
-        x, y = pos.get_x(), pos.get_y()
+    def _draw_dir_down(self, x, y, down):
         tile_size = self.windowSize/self.max_dim
         x0, y0 = self._map_coords(x, y)
         if down:
@@ -200,8 +202,7 @@ class RobotVisualization:
             return self.w.create_polygon(
                 x1, y1, x2, y2, x3, y3, fill="blue")
 
-    def _draw_dir_left(self, pos, left):
-        x, y = pos.get_x(), pos.get_y()
+    def _draw_dir_left(self, x, y, left):
         tile_size = self.windowSize/self.max_dim
         x0, y0 = self._map_coords(x, y)
         if left:
@@ -243,16 +244,20 @@ class RobotVisualization:
         for i in range(room.get_width()):
             for j in range(room.get_height()):
                 self.tilesDirections.append(self._draw_dir_up(
-                    room.tiles[i][j].get_pos(),
+                    room.tiles[i][j].get_x(),
+                    room.tiles[i][j].get_y(),
                     room.tiles[i][j].get_dir().get_up()))
                 self.tilesDirections.append(self._draw_dir_right(
-                    room.tiles[i][j].get_pos(),
+                    room.tiles[i][j].get_x(),
+                    room.tiles[i][j].get_y(),
                     room.tiles[i][j].get_dir().get_right()))
                 self.tilesDirections.append(self._draw_dir_down(
-                    room.tiles[i][j].get_pos(),
+                    room.tiles[i][j].get_x(),
+                    room.tiles[i][j].get_y(),
                     room.tiles[i][j].get_dir().get_down()))
                 self.tilesDirections.append(self._draw_dir_left(
-                    room.tiles[i][j].get_pos(),
+                    room.tiles[i][j].get_x(),
+                    room.tiles[i][j].get_y(),
                     room.tiles[i][j].get_dir().get_left()))
 
         # Update text
@@ -265,6 +270,7 @@ class RobotVisualization:
         time.sleep(self.delay)
 
     def done(self):
-        "Indicate that the animation is done so that we allow the user to close the window."
+        """
+        Indicate that the animation is done so that we allow the user to close the window.
+        """
         mainloop()
-

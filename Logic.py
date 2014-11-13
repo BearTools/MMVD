@@ -1,6 +1,6 @@
 __author__ = 'wojciech'
 
-
+'''
 class Position(object):
     """
     Position represents a location in magazine
@@ -25,7 +25,7 @@ class Position(object):
     def __str__(self):
         return '(' + str(self.x) + ', ' + str(self.y) + ')'
 
-
+'''
 class Direction(object):
     """
     Directions encoding is as follow:
@@ -113,27 +113,28 @@ class Magazine(object):
 
     """
 
-    def __init__(self, width, height, robot_list):
+    def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.tiles = [[Tile(Position(j, i), Direction()) for i in range(height)] for j in range(width)]
-        self.robot_list = robot_list
+        self.tiles = [[Tile(j, i, Direction()) for i in range(height)] for j in range(width)]
+        self.robot_list = []
+        self.shelf_list = []
 
-    def get_tile_directions(self, pos):
+    def get_tile_directions(self, x, y):
         """
-        :param pos: position of a tile
+
         :return: dir for tile at position pos
         """
-        return self.tiles[pos.get_x()][pos.get_y()].get_dir()
+        return self.tiles[x][y].get_dir()
 
-    def set_tile_direction(self, pos, dir_):
+    def set_tile_direction(self, x, y, dir_):
         """
         sets dir to a tile at pos
         :param pos:
         :param dir_:
         :return:
         """
-        self.tiles[pos.get_x][pos.get_y].set_dir(dir_)
+        self.tiles[x][y].set_dir(dir_)
 
     def get_tile(self, x, y):
         return self.tiles[x][y]
@@ -162,53 +163,66 @@ class Magazine(object):
         return self.height
 
 
+
 class Robot(object):
     """
     Represents robot.
-    Defines position of robot.
+    Defines position of robot as coordinates (x, y)
     Defines all possible direction for a robot to go in the next step
     Keeps track of shelf being carried by robot
     Has his
     """
-    def __init__(self, pos=None, _dir=Direction()):
-        if not pos:
-            pos = Position(0, 0)
-        self.pos = pos
+    def __init__(self, x=0, y=0, _dir=Direction()):
+        self.x = x
+        self.y = y
         self.dir = _dir
-        #self.shelf = shelf shelf not implemented
-
-    def set_pos(self, pos):
-        self.pos = pos
-
-    def get_pos(self):
-        return self.pos
-
-    def set_dir(self, dir_):
-        self.dir = dir_
+        #self.shelf = Shelf()
 
     def get_dir(self):
         return self.dir
 
+    def get_x(self):
+        return self.x
+
+    def get_y(self):
+        return self.y
+
+    def set_dir(self, dir_):
+        self.dir = dir_
+
+    def set_x(self, x):
+        self.x = x
+
+    def set_y(self, y):
+        self.y = y
+
     def __str__(self):
-        return str(self.pos) + '\n' + str(self.dir)
+        return '(' + str(self.x) + ', ' + str(self.y) + ')\n' + str(self.dir)
 
 
 class Tile(object):
     """
     Single tile in the magazine. Has position, and possible direction.
     """
-    def __init__(self, pos, dir_):
-        self.pos = pos
+    def __init__(self, x, y, dir_):
+        self.x = x
+        self.y = y
         self.dir = dir_
 
-    def get_pos(self):
-        return self.pos
+    def get_x(self):
+        return self.x
+
+    def get_y(self):
+        return self.y
 
     def get_dir(self):
         return self.dir
 
-    def set_pos(self, pos):
-        self.pos = pos
+    def set_x(self, x):
+        self.x = x
+
+    def set_y(self, y):
+        self.y = y
 
     def set_dir(self, dir_):
         self.dir = dir_

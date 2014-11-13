@@ -13,7 +13,7 @@ def build_magazine(width, height):
     There are roads that lead up for every shelf
     exit points and shelfs will be implemented in the future
     """
-    magazine = Magazine(width, height, [])
+    magazine = Magazine(width, height)
     magazine.get_tile(0, 0).set_dir(Direction(up=True))
     magazine.get_tile(width-1, 0).set_dir(Direction(left=True))
     magazine.get_tile(0, height-1).set_dir(Direction(right=True))
@@ -37,8 +37,9 @@ def build_magazine(width, height):
 
 
 def visualize_test():
-    pos = Position(1, 1)
-    robot = Robot(pos, Direction())
+    x = 1
+    y = 1
+    robot = Robot(x, y, Direction())
     robot_list = []
     robot_list.append(robot)
     magazine = build_magazine(15, 15)  # build 15x15 magazine with simple rules
@@ -50,17 +51,22 @@ def visualize_test():
 
         for robot in magazine.get_robots():
             robot.set_dir(magazine.get_tile(
-                robot.get_pos().get_x(), robot.get_pos().get_y()).get_dir())
+                robot.get_x(), robot.get_y()).get_dir())
             if robot.get_dir().get_up():
-                robot.set_pos(Position(robot.get_pos().get_x(), robot.get_pos().get_y() + 1))
+                robot.set_x(robot.get_x())
+                robot.set_y(robot.get_y() + 1)
             elif robot.get_dir().get_right():
-                robot.set_pos(Position(robot.get_pos().get_x() + 1, robot.get_pos().get_y()))
+                robot.set_x(robot.get_x() + 1)
+                robot.set_y(robot.get_y())
             elif robot.get_dir().get_down():
-                robot.set_pos(Position(robot.get_pos().get_x(), robot.get_pos().get_y() - 1))
+                robot.set_x(robot.get_x())
+                robot.set_y(robot.get_y() - 1)
             elif robot.get_dir().get_left():
-                robot.set_pos(Position(robot.get_pos().get_x() - 1, robot.get_pos().get_y()))
+                robot.set_x(robot.get_x() - 1)
+                robot.set_y(robot.get_y())
             print robot.get_dir()
-            print robot.get_pos()
+            print str(robot.get_x()) + " " + str(robot.get_y())
+
         animation.update(magazine, magazine.get_robots())
     animation.done()
 
@@ -93,5 +99,12 @@ def test_reading_warehouse_map(tmpdir):
     assert map_ == array
 
 
+def test_magazine_class():
+    magazin = Magazine(5, 6)
+    assert magazin.get_width() == 5
+    assert magazin.get_height() == 6
+    assert magazin.get_tile_direciont(4, 5) == Tile(4, 5)
 
-print read_warehouse_map('test_data/magazine1.map')
+
+if __name__ == "__main__":
+    test_magazine_class()
