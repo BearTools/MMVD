@@ -117,7 +117,7 @@ class Magazine(object):
     def add_shelf(self, shelf):
         self.shelf_list.append(shelf)
 
-    def build_from_array(self, array=[[]]):
+    def build_from_array(self, array=[[]], robot_array=[[]]):
         """
         Very important function!
         Creates magazine based on content of array
@@ -125,37 +125,45 @@ class Magazine(object):
         self.exit_points=[]
         self.shelf_list = []
         for i in range(len(array)):
-            #print i
             for j in range(len(array[i])):
-                # print array[i][j],
                 if array[i][j] == 1:
                     self.get_tile(j, len(array)-i-1).set_direction(Direction(up=True))
-                    continue
-                if array[i][j] == 2:
+                elif array[i][j] == 2:
                     self.get_tile(j, len(array)-i-1).set_direction(Direction(right=True))
-                    continue
-                if array[i][j] == 3:
+                elif array[i][j] == 3:
                     self.get_tile(j, len(array)-i-1).set_direction(Direction(down=True))
-                    continue
-                if array[i][j] == 4:
+                elif array[i][j] == 4:
                     self.get_tile(j, len(array)-i-1).set_direction(Direction(left=True))
-                    continue
-                if array[i][j] == 9:
+                elif array[i][j] == 9:
                     self.exit_points.append((j, len(array)-i-1))
                     self.get_tile(j, len(array)-1-i).set_direction(Direction())
-                    continue
                 else:
-
                     self.shelf_list.append(Shelf(j, len(array)-1-i, array[i][j]))
                     self.get_tile(j, len(array)-1-i).set_direction(Direction())
                     continue
 
+        print len(self.robot_list)
+        for robot_index in range(len(robot_array)):
+            if len(self.robot_list) < len(robot_array):
+                for robot in robot_array:
+                    self.robot_list.append(Robot())
+            self.robot_list[robot_index].set_x(robot_array[robot_index][0])
+            self.robot_list[robot_index].set_y(self.get_height()-1-robot_array[robot_index][1])
+            if robot_array[robot_index][2] == 1:
+                self.robot_list[robot_index].set_direction(Direction(up=True))
+            elif robot_array[robot_index][2] == 2:
+                self.robot_list[robot_index].set_direction(Direction(right=True))
+            elif robot_array[robot_index][2] == 3:
+                self.robot_list[robot_index].set_direction(Direction(down=True))
+            elif robot_array[robot_index][2] == 4:
+                self.robot_list[robot_index].set_direction(Direction(left=True))
+
+
     def show(self):
         self.visualize = RobotVisualization(self.get_width(),self.get_height())
-        self.visualize.update(self, self.get_robot_list())
 
-    def update(self, array):
-        self.build_from_array(array)
+    def update(self, map_, robot_array):
+        self.build_from_array(map_, robot_array)
         self.visualize.update(self, self.get_robot_list())
 
     def end(self):
@@ -200,7 +208,6 @@ class Robot(object):
     Defines position of robot as coordinates (x, y)
     Defines all possible direction for a robot to go in the next step
     Keeps track of shelf being carried by robot
-    Has his
     """
     def __init__(self, x=0, y=0, _dir=Direction()):
         self.x = x

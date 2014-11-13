@@ -123,6 +123,8 @@ def test_robot_class():
 def test_magazine_class():
     magazine = Magazine(5, 6)
     magazine.show()
+    robot_array = ([[0, 1, 2, None],
+                   [3, 2, 1, None]])
     arr = ([[2, 2, 2, 2, 3],
            [1, "a", 1, "B", 3],
            [1, "c", 1, "d", 3],
@@ -130,7 +132,7 @@ def test_magazine_class():
            [1, "g", "h","i", 3],
            [1, 4, 4, 4, 9],
     ])
-    magazine.update(arr)
+    magazine.update(arr, robot_array)
     arr = ([[2, 2, 2, 2, 3],
             [1, "a", 1, "b", 3],
             [1, "c", 1, "d", 3],
@@ -138,7 +140,7 @@ def test_magazine_class():
             [1, "g", 4, "i", 3],
             [1, 4, 4, 9, 1],
     ])
-    magazine.update(arr)
+    magazine.update(arr,robot_array)
     arr = ([[2, 2, 2, 2, 3],
             [1, "a", 1, "H", 3],
             [1, "c", 1, "d", 3],
@@ -146,7 +148,7 @@ def test_magazine_class():
             [1, 4, 4, 3, 3],
             [1, 1, 9, 1, 1],
     ])
-    magazine.update(arr)
+    magazine.update(arr, robot_array)
     magazine.end()
 
 

@@ -93,10 +93,10 @@ class RobotVisualization:
         x, y = robot.get_x(), robot.get_y()
         tile_size = self.windowSize/self.max_dim
         x0, y0, = self._map_coords(x, y)
-        return self.w.create_oval(x0 + int(tile_size*0.25),
-                                  y0 - int(tile_size*0.25),
-                                  x0 + int(tile_size*0.75),
-                                  y0 - int(tile_size*0.75),
+        return self.w.create_oval(x0 + int(tile_size*0.2),
+                                  y0 - int(tile_size*0.2),
+                                  x0 + int(tile_size*0.8),
+                                  y0 - int(tile_size*0.8),
                                   fill="red")
 
     def _draw_robot_up(self, robot):
@@ -235,17 +235,17 @@ class RobotVisualization:
         """
         tile_size = self.windowSize/self.max_dim
         x0, y0 = self._map_coords(x, y)
-        return self.w.create_rectangle(x0 + tile_size * 0.3,
-                                       y0 - tile_size * 0.3,
-                                       x0 + tile_size * 0.7,
-                                       y0 - tile_size * 0.7,
+        return self.w.create_rectangle(x0 + tile_size * 0.35,
+                                       y0 - tile_size * 0.35,
+                                       x0 + tile_size * 0.65,
+                                       y0 - tile_size * 0.65,
                                        fill="orange")
 
     def _draw_shelf_name(self, x, y, name):
         tile_size = self.windowSize/self.max_dim
         x0, y0 = self._map_coords(x, y)
-        return self.w.create_text(x0 + tile_size*0.4,
-                                  y0 - tile_size*0.6,
+        return self.w.create_text(x0 + tile_size*0.5,
+                                  y0 - tile_size*0.5,
                                   anchor=NW,
                                   text=name)
 
