@@ -103,7 +103,18 @@ def test_reading_warehouse_map(warehouse_map1):
 
 
 @pytest.mark.utils
-def test_neighbors(warehouse_map1):
+@pytest.mark.parametrize("position,expected", [
+    ((0, 0), ((1, 0),)),
+    ((1, 1), ((1, 0), (2, 1), (0, 1))),
+    ((4, 4), ((3, 4),)),
+    ((2, 0), ((3, 0),)),
+])
+def test_neighbors(warehouse_map1, position, expected):
+    assert expected == neighbors(warehouse_map1, position, available_only=True,
+                                 positions=True)
+
+
+def test_neighbors2(warehouse_map1):
     position = (0, 0)
     assert (0, 2, 1, 0) == neighbors(warehouse_map1, position,
                                      available_only=False, positions=False)
@@ -118,32 +129,19 @@ def test_neighbors(warehouse_map1):
     assert (2, 1, 1) == neighbors(warehouse_map1, position,
                                   available_only=True, positions=False)
 
-    assert ((1, 0), (2, 1), (0, 1)) == neighbors(warehouse_map1, position,
-                                                 available_only=True,
-                                                 positions=True)
-
-    position = (4, 4)
-    assert ((3, 4),) == neighbors(warehouse_map1, position,
-                                  available_only=True, positions=True)
-
-    position = (2, 0)
-    assert ((3, 0),) == neighbors(warehouse_map1, position,
-                                  available_only=True, positions=True)
-
 
 @pytest.mark.utils
-def test_a_star(warehouse_map1):
+@pytest.mark.parametrize("start,end,path", [
+    ((4, 4), (0, 0), [(4, 4), (3, 4), (2, 4), (1, 4), (0, 4), (0, 3), (0, 2),
+                      (0, 1), (0, 0)]),
+    ((0, 0), (2, 1), [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (4, 1), (4, 2),
+                      (4, 3), (4, 4), (3, 4), (2, 4), (2, 3), (2, 2), (2, 1)]),
+    ((4, 4), (3, 1), [(4, 4), (3, 4), (2, 4), (2, 3), (2, 2), (2, 1), (3, 1)])
+])
+def test_a_star(warehouse_map1, start, end, path):
     """
     Test accuracy and correctness of the A* algorithm.
     """
-    start = (4, 4)
-    end = (0, 0)
-    length, iterations, path = shortest_path(warehouse_map1, start, end)
-    assert length == 8
-    assert path == [(4, 4), (3, 4), (2, 4), (1, 4), (0, 4), (0, 3), (0, 2),
-                    (0, 1), (0, 0)]
-
-    start = (0, 0)
-    end = (2, 1)
-    length, iterations, path = shortest_path(warehouse_map1, start, end)
-    assert length == 13
+    length, iterations, final_path = shortest_path(warehouse_map1, start, end)
+    assert length == len(path) - 1
+    assert final_path == path

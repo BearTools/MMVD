@@ -11,12 +11,16 @@ class PathUnreachable(Exception):
     message = "Cannot find route to the destination."
 
 
-def neighbors(map_, position, available_only=False, positions=True):
+def neighbors(map_, position, final=None, available_only=False,
+              positions=True):
     """
     Return Von Neumann neighborhood of distance r=1.
 
     :param array map_: a warehouse map
     :param pair position: a ``(x, y)`` of current position on the map
+    :param pair final: a ``(x, y)`` of final position on the map.  If this is
+                       specified, and final position is one of the neighbors,
+                       it gets included in the results
     :param bool available_only: return only available moves (according to the
                                 traffic rules)
     :param bool positions: return pairs ``(x, y)`` instead of values
@@ -45,14 +49,16 @@ def neighbors(map_, position, available_only=False, positions=True):
 
     # below this point: implementation of right-hand traffic rules
 
+    # import string
+    # shelves = tuple(string.ascii_letters)
     # rules according to right-hand traffic (suck it, Britain!)
     # 1. can't go in opposite (180°) direction
     # 2. can't turn left
     allowed_moves = {
-        1: (1, 2),
-        2: (2, 3),
-        3: (3, 4),
-        4: (4, 1)
+        1: (1, 2, 9),
+        2: (2, 3, 9),
+        3: (3, 4, 9),
+        4: (4, 1, 9)
     }
 
     # checking if neighbors comply with traffic rules
@@ -83,6 +89,19 @@ def neighbors(map_, position, available_only=False, positions=True):
         results[1][1] = right_pos
         results[2][1] = down_pos
         results[3][1] = left_pos
+
+    # check if final position is in the closest neighborhood and it's a shelf
+    if (positions and final and manhattan_dist(map_, position, final) == 1
+            and isinstance(map_[final[1]][final[0]], str)):
+        # ...and include it if so
+        if final == up_pos:
+            results[0][0] = True
+        if final == right_pos:
+            results[1][0] = True
+        if final == down_pos:
+            results[2][0] = True
+        if final == left_pos:
+            results[3][0] = True
 
     # return only directions that have True as the first element in pair
     return tuple(map(lambda x: x[1], filter(lambda x: x[0], results)))
@@ -155,6 +174,9 @@ def a_star(map_, start_position, end_position):
     heapq.heappush(heap, (0, 0, start_position))
     # keep a count of the  number of steps, and avoid an infinite loop.
     for step in xrange(1000000):
+        if len(heap) == 0:
+            raise PathUnreachable()
+
         f, junk, current = heapq.heappop(heap)
 
         if current == end_position:
@@ -163,7 +185,8 @@ def a_star(map_, start_position, end_position):
                                                 link)
 
         # get only the neighbors that we can go to
-        moves = neighbors(map_, current, available_only=True, positions=True)
+        moves = neighbors(map_, current, final=end_position,
+                          available_only=True, positions=True)
 
         distance = g[current]
         for move in moves:
