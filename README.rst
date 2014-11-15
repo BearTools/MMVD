@@ -35,20 +35,28 @@ Installation
 
 1. (Optional) Make a virtual environment and activate it::
 
-    virtualenv MMVD_venv
-    source MMVD_venv/bin/activate
+    $ virtualenv MMVD_venv
+    $ source MMVD_venv/bin/activate
 
-3. Clone this repository::
+2. Clone this repository::
 
-    cd MMVD_venv
-    git clone https://github.com/WojciechFocus/MMVD.git
-    cd MMVD
+    $ cd MMVD_venv
+    $ git clone https://github.com/WojciechFocus/MMVD.git
+    $ cd MMVD
 
-4. Install this application::
+3. Install this application::
 
-    pip install -r requirements.txt
+    $ python setup.py install
 
 It should now be installed.
+
+Development
+-----------
+
+Follow :ref:`Installation` but in point 3. invoke this command::
+
+    $ pip install -e .
+
 
 Launch
 ------
