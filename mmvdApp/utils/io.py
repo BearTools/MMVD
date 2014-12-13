@@ -2,14 +2,26 @@
 import numpy as np
 
 
+def remove_line_ending(line):
+    return line.rstrip()
+
+
+def filter_out_empty(line):
+    return len(line)
+
+
+def process_lines(lines):
+    lines = map(remove_line_ending, lines)  # get rid of line endings
+    lines = filter(filter_out_empty, lines)  # get rid of empty lines
+    return lines
+
+
 def read_warehouse_map(name, use_numpy=False):
     """
     Read the file line by line and represent it as an array or list of lists.
     """
     with open(name, 'r') as f:
-        lines = f.readlines()
-    lines = map(lambda x: x.rstrip(), lines)  # get rid of line endings
-    lines = filter(len, lines)  # get rid of empty lines
+        lines = process_lines(f.readlines())
     lines = map(list, lines)  # split each line into list (ie. mutable string)
 
     # change '0' to '9' into integers 0-9
@@ -27,3 +39,20 @@ def read_warehouse_map(name, use_numpy=False):
         lines = np.array(lines)
 
     return lines
+
+
+def read_robots_positions(name):
+    """
+    Read a file declaring number of robots and their starting positions.  All
+    robots can start from the same position.
+    """
+    with open(name, 'r') as f:
+        lines = process_lines(f.readlines())
+
+    # robots_number = len(lines)
+    starting_positions = []
+    for line in lines:
+        y_pos, x_pos = map(int, line.split(","))
+        starting_positions.append((y_pos, x_pos))
+
+    return starting_positions
