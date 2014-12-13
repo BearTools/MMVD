@@ -27,10 +27,10 @@ class PyTest(TestCommand):
 
 
 readme = open('README.rst').read()
-# requirements = open('requirements/production.txt').readlines()
-requirements = """
-pytest==2.6.3
-"""
+requirements = open('requirements.txt').readlines()
+# requirements = """
+# pytest==2.6.3
+# """
 
 
 setup(
