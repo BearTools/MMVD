@@ -67,4 +67,5 @@ def test_magazine_class():
         ]
     )
     magazine.update(arr, robot_array)
-    magazine.end()
+    # TODO: for some strange reason, .end() only keeps application running
+    # magazine.end()

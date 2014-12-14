@@ -19,3 +19,5 @@ def run_application(warehouse_filename, robots_filename, order_filename):
     warehouse = Magazine(width, height)
 
     warehouse.show()
+    warehouse.update(map, [[3, 1, 2, None]])
+    warehouse.end()  # TODO: what an unfortunate name
