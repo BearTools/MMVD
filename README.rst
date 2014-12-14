@@ -61,4 +61,17 @@ Follow :ref:`Installation` but in point 3. invoke this command::
 Launch
 ------
 
-Not yet.
+After installing the package, ``MMVD.py`` executable should become available
+in your system::
+
+    $ MMVD.py --help
+    Usage: MMVD.py [OPTIONS] WAREHOUSE ROBOTS ORDER
+
+      Start application and load specific warehouse map from WAREHOUSE, load
+      initial robots positions from ROBOTS.  Finally load products order from
+      ORDER.
+
+      All paths must be readable, existing files.
+
+    Options:
+      --help  Show this message and exit.
