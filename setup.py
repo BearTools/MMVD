@@ -63,4 +63,5 @@ setup(
     cmdclass={
         'test': PyTest
     },
+    scripts=['bin/MMVD.py'],
 )
