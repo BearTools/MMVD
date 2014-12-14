@@ -30,6 +30,7 @@ def test_robot_class():
 
 @pytest.mark.frontend
 def test_magazine_class():
+    # TODO: add some assertions here?!
     magazine = Magazine(5, 6)
     magazine.show()
     robot_array = ([[0, 1, 2, None],

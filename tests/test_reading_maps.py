@@ -2,6 +2,7 @@ import pytest
 
 
 @pytest.mark.utils
+@pytest.mark.io
 def test_reading_warehouse_map(warehouse_map1):
     """
     Test if ``utils.read_warehouse_map`` works properly.

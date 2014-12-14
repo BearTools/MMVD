@@ -5,6 +5,7 @@ from mmvdApp.shortest_path import a_star as shortest_path
 
 
 @pytest.mark.utils
+@pytest.mark.pathing
 @pytest.mark.parametrize("position,expected", [
     ((0, 0), ((1, 0),)),
     ((1, 1), ((1, 0), (2, 1), (0, 1))),
@@ -17,6 +18,7 @@ def test_neighbors(warehouse_map1, position, expected):
 
 
 @pytest.mark.utils
+@pytest.mark.pathing
 def test_neighbors2(warehouse_map1):
     position = (0, 0)
     assert (0, 2, 1, 0) == neighbors(warehouse_map1, position,
@@ -34,6 +36,7 @@ def test_neighbors2(warehouse_map1):
 
 
 @pytest.mark.utils
+@pytest.mark.pathing
 @pytest.mark.parametrize("start,end,path", [
     ((4, 4), (0, 0), [(4, 4), (3, 4), (2, 4), (1, 4), (0, 4), (0, 3), (0, 2),
                       (0, 1), (0, 0)]),
