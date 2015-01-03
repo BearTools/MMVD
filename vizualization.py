@@ -21,15 +21,10 @@ class Visualization(Frame):
         self.max_dim = max(self.y_dim, self.x_dim)
 
         self.robotspeed = 10
+        self.robot_number = 0
+
         self.tile_len = self.magazine_len / self.max_dim
         self.canvas = Canvas(self.magazine_frame, width=self.magazine_len, height=self.magazine_len)
-
-        # Simple menu bar to be extended
-
-        menu_bar = Menu(self.master)
-        self.master.config(menu=menu_bar)
-        file_menu = Menu(menu_bar)
-        menu_bar.add_cascade(label="File", menu=file_menu)
 
         speed_scale = Scale(self.control_frame,
                             from_=1,
@@ -54,7 +49,8 @@ class Visualization(Frame):
         self.w = OptionMenu(self.master, self.variable, "100x100", "200x200", "300x300",
                        "400x400", "500x500", "600x600", "700x700", "800x800", "900x900")
         self.w.pack()
-        self.canvas.pack(expand=YES)
+
+        self.canvas.pack()
 
         # Start of drawing magazine.
         # Tiles are drawn first, they are on the bottom of magazine
@@ -183,7 +179,6 @@ class Visualization(Frame):
                                                outline="black",
                                                stipple='gray75',
                                                width=3, )
-                # draws shelfs
                 else:
                     self.canvas.create_rectangle(self.tile_len * j + 0.25 * self.tile_len,
                                                  self.tile_len * i + 0.25 * self.tile_len,
@@ -209,15 +204,15 @@ class Visualization(Frame):
         :param robot_list: List of robots
         :return: None
         """
-        i = 0
+
         for robot in robot_list:
             self.canvas.create_oval(robot[0] * self.tile_len + self.tile_len * 0.2,
                                     robot[1] * self.tile_len + self.tile_len * 0.2,
                                     robot[0] * self.tile_len + self.tile_len * 0.8,
                                     robot[1] * self.tile_len + self.tile_len * 0.8,
                                     fill="blue",
-                                    tag="robot" + str(i))
-            i += 1
+                                    tag="robot" + str(self.robot_number))
+            self.robot_number += 1
 
     def hide_shelf(self, shelf_id):
         """
@@ -293,17 +288,10 @@ class Visualization(Frame):
     def speed_scale_command(self, value):
         self.robotspeed = int(value)
 
-    def on_exit(self):
-        self.master.destroy()
-
     def end(self):
         self.mainloop()
 
     def resize_magazine(self, val):
-        """
-        It is used to change size of the magazine view. 
-        
-        """
         if val == "100x100":
             self.canvas.scale("all", 0, 0, float(100)/self.magazine_len, float(100)/self.magazine_len)
             self.magazine_len = 100
