@@ -25,14 +25,10 @@ class Visualization(Frame):
         self.canvas = Canvas(self.magazine_frame, width=self.magazine_len, height=self.magazine_len)
 
         # Simple menu bar to be extended
-        # It would be nice if there was an option to log in complete
-        # Solution to problem from .txt file
 
         menu_bar = Menu(self.master)
         self.master.config(menu=menu_bar)
         file_menu = Menu(menu_bar)
-        # file_menu.add_command(label="New", command=self.donothing)
-        # file_menu.add_command(label="Exit", command=self.on_exit())
         menu_bar.add_cascade(label="File", menu=file_menu)
 
         speed_scale = Scale(self.control_frame,
@@ -59,8 +55,6 @@ class Visualization(Frame):
                        "400x400", "500x500", "600x600", "700x700", "800x800", "900x900")
         self.w.pack()
         self.canvas.pack(expand=YES)
-
-        # x_len i y_len should be part of init procedure
 
         # Start of drawing magazine.
         # Tiles are drawn first, they are on the bottom of magazine
@@ -189,6 +183,7 @@ class Visualization(Frame):
                                                outline="black",
                                                stipple='gray75',
                                                width=3, )
+                # draws shelfs
                 else:
                     self.canvas.create_rectangle(self.tile_len * j + 0.25 * self.tile_len,
                                                  self.tile_len * i + 0.25 * self.tile_len,
@@ -305,6 +300,10 @@ class Visualization(Frame):
         self.mainloop()
 
     def resize_magazine(self, val):
+        """
+        It is used to change size of the magazine view. 
+        
+        """
         if val == "100x100":
             self.canvas.scale("all", 0, 0, float(100)/self.magazine_len, float(100)/self.magazine_len)
             self.magazine_len = 100
