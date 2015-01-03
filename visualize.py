@@ -34,17 +34,9 @@ class RobotVisualization:
         # Draw a backing and lines
         x1, y1 = self._map_coords(0, 0)
         x2, y2 = self._map_coords(width, height)
-        self.w.create_rectangle(x1, y1, x2, y2, fill="white")
+        self.w.create_rectangle(x1, y1, x2, y2, fill="grey")
 
         self.tiles = {}
-        for i in range(width):
-            for j in range(height):
-                x1, y1 = self._map_coords(i, j)
-                x2, y2 = self._map_coords(i + 1, j + 1)
-                self.tiles[(i, j)] = \
-                    self.w.create_rectangle(x1, y1,
-                                            x2, y2,
-                                            fill="gray")
 
         # Draw grid lines
         for i in range(width + 1):
@@ -58,7 +50,6 @@ class RobotVisualization:
 
         # Draw some status text
         self.robots = None
-        self.robotsDirections = None
         self.tilesDirections = None
         self.exit_points = None
         self.shelfs = None
@@ -78,6 +69,8 @@ class RobotVisualization:
     def _map_coords(self, x, y):
         """
         Maps grid positions to window positions (in pixels).
+        :param x: x cartesian coordinate
+        :param y: y cartesian coordinate
         """
         return (self.windowSize/2 + 25 + self.windowSize *
                 ((x - self.width / 2.0) / self.max_dim),
@@ -99,66 +92,6 @@ class RobotVisualization:
                                   y0 - int(tile_size*0.8),
                                   fill="red")
 
-    def _draw_robot_up(self, robot):
-        x, y = robot.get_x(), robot.get_y()
-        tile_size = self.windowSize/self.max_dim
-        x0, y0, = self._map_coords(x, y)
-        direction = robot.get_direction()
-        if direction.get_up():
-            x1 = x0 + int(tile_size*0.4)
-            y1 = y0 - int(tile_size*0.65)
-            x2 = x0 + int(tile_size*0.6)
-            y2 = y0 - int(tile_size*0.65)
-            x3 = x0 + int(tile_size*0.5)
-            y3 = y0 - int(tile_size*0.73)
-            return self.w.create_polygon(
-                x1, y1, x2, y2, x3, y3, fill="darkgreen")
-
-    def _draw_robot_right(self, robot):
-        x, y = robot.get_x(), robot.get_y()
-        tile_size = self.windowSize/self.max_dim
-        x0, y0, = self._map_coords(x, y)
-        direction = robot.get_direction()
-        if direction.get_right():
-            x1 = x0 + int(tile_size*0.73)
-            y1 = y0 - int(tile_size*0.5)
-            x2 = x0 + int(tile_size*0.65)
-            y2 = y0 - int(tile_size*0.4)
-            x3 = x0 + int(tile_size*0.65)
-            y3 = y0 - int(tile_size*0.6)
-            return self.w.create_polygon(
-                x1, y1, x2, y2, x3, y3, fill="darkgreen")
-
-    def _draw_robot_down(self, robot):
-        x, y = robot.get_x(), robot.get_y()
-        tile_size = self.windowSize/self.max_dim
-        x0, y0, = self._map_coords(x, y)
-        direction = robot.get_direction()
-        if direction.get_down():
-            x1 = x0 + int(tile_size*0.4)
-            y1 = y0 - int(tile_size*0.35)
-            x2 = x0 + int(tile_size*0.6)
-            y2 = y0 - int(tile_size*0.35)
-            x3 = x0 + int(tile_size*0.5)
-            y3 = y0 - int(tile_size*0.27)
-            return self.w.create_polygon(
-                x1, y1, x2, y2, x3, y3, fill="darkgreen")
-
-    def _draw_robot_left(self, robot):
-        x, y = robot.get_x(), robot.get_y()
-        tile_size = self.windowSize/self.max_dim
-        x0, y0, = self._map_coords(x, y)
-        direction = robot.get_direction()
-        if direction.get_left():
-            x1 = x0 + int(tile_size*0.27)
-            y1 = y0 - int(tile_size*0.5)
-            x2 = x0 + int(tile_size*0.35)
-            y2 = y0 - int(tile_size*0.4)
-            x3 = x0 + int(tile_size*0.35)
-            y3 = y0 - int(tile_size*0.6)
-            return self.w.create_polygon(
-                x1, y1, x2, y2, x3, y3, fill="darkgreen")
-
 # -------------------------------------------------------------------------
     # set of functions to update all possible directions for a given tile
     # This way of adding elements allows to delete them from visualisation
@@ -175,7 +108,7 @@ class RobotVisualization:
             x3 = x0 + int(tile_size*0.5)
             y3 = y0 - int(tile_size*0.98)
             return self.w.create_polygon(
-                x1, y1, x2, y2, x3, y3, fill="blue")
+                x1, y1, x2, y2, x3, y3, fill="black")
 
     def _draw_dir_right(self, x, y, right):
         tile_size = self.windowSize/self.max_dim
@@ -188,7 +121,7 @@ class RobotVisualization:
             x3 = x0 + int(tile_size*0.85)
             y3 = y0 - int(tile_size*0.6)
             return self.w.create_polygon(
-                x1, y1, x2, y2, x3, y3, fill="blue")
+                x1, y1, x2, y2, x3, y3, fill="black")
 
     def _draw_dir_down(self, x, y, down):
         tile_size = self.windowSize/self.max_dim
@@ -201,7 +134,7 @@ class RobotVisualization:
             x3 = x0 + int(tile_size*0.5)
             y3 = y0 - int(tile_size*0.02)
             return self.w.create_polygon(
-                x1, y1, x2, y2, x3, y3, fill="blue")
+                x1, y1, x2, y2, x3, y3, fill="black")
 
     def _draw_dir_left(self, x, y, left):
         tile_size = self.windowSize/self.max_dim
@@ -214,7 +147,7 @@ class RobotVisualization:
             x3 = x0 + int(tile_size*0.15)
             y3 = y0 - int(tile_size*0.6)
             return self.w.create_polygon(
-                x1, y1, x2, y2, x3, y3, fill="blue")
+                x1, y1, x2, y2, x3, y3, fill="black")
 
     def _draw_exit_point(self, x, y):
         """
@@ -244,36 +177,18 @@ class RobotVisualization:
     def _draw_shelf_name(self, x, y, name):
         tile_size = self.windowSize/self.max_dim
         x0, y0 = self._map_coords(x, y)
-        return self.w.create_text(x0 + tile_size*0.5,
-                                  y0 - tile_size*0.5,
+        return self.w.create_text(x0 + tile_size*0.45,
+                                  y0 - tile_size*0.55,
                                   anchor=NW,
                                   text=name)
 
-    def update(self, room, robots):
-        # Redraw all elements in magazine that can move
-        # Does not take into account that most of things
-        # does not move at all
-        # CAUTION!
-        #     there is a bug!
-        #     when exit point or shelf is added
-        #     the direction is not deleted
-        # FIXED
-        # Preferred behaviour:
-        # (1) Redraw only those elements that changed position
-        # (2) make robots move smoothly
-        # (3) make it pretty
+    def oldUpdate(self, room, robots):
 
         # Delete all existing robots.
         if self.robots:
             for robot in self.robots:
                 self.w.delete(robot)
                 self.master.update_idletasks()
-        # Delete all existing robotDirections
-        if self.robotsDirections:
-            for dir_ in self.robotsDirections:
-                self.w.delete(dir_)
-                self.master.update_idletasks()
-        # Delete all existing main roads
         if self.tilesDirections:
             for dir_ in self.tilesDirections:
                 self.w.delete(dir_)
@@ -295,7 +210,7 @@ class RobotVisualization:
                 self.w.update_idletasks()
 
         self.robots = []
-        self.robotsDirections = []
+        # self.robotsDirections = []
         self.tilesDirections = []
         self.exit_points = []
         self.shelfs = []
@@ -307,10 +222,6 @@ class RobotVisualization:
         for robot in robots:
             self.robots.append(
                 self._draw_robot(robot))
-            self.robotsDirections.append(self._draw_robot_up(robot))
-            self.robotsDirections.append(self._draw_robot_right(robot))
-            self.robotsDirections.append(self._draw_robot_down(robot))
-            self.robotsDirections.append(self._draw_robot_left(robot))
 
         for i in range(room.get_width()):
             for j in range(room.get_height()):
