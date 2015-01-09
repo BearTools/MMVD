@@ -6,12 +6,19 @@
 Welcome to MMVD's documentation!
 ================================
 
-Contents:
+MMVD is a simulation application for robots-controlled warehouses.
+
+Contents
+--------
 
 .. toctree::
    :maxdepth: 2
 
+   installation
    code
+
+
+.. include:: ../../README.rst
 
 
 Indices and tables

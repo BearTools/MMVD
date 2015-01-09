@@ -1,4 +1,3 @@
-============================================
 MMVD: a robot controlled warehouse simulator
 ============================================
 
@@ -30,6 +29,8 @@ We use `A* <http://en.wikipedia.org/wiki/A*_search_algorithm>`_ for finding
 paths and `Tabu search <http://en.wikipedia.org/wiki/Tabu_search>`_ for
 assigning robots to shelves.
 
+.. _installation:
+
 Installation
 ------------
 
@@ -53,7 +54,7 @@ It should now be installed.
 Development
 -----------
 
-Follow :ref:`Installation` but in point 3. invoke this command::
+Follow :ref:`installation` but in point 3. invoke this command::
 
     $ pip install -e .
 
