@@ -20,7 +20,7 @@ def valid_solution(solution, order, drop_zone):
 
     # TODO: can optimize by checking order on the fly
     for state in solution:
-        # check if some product if being dropped
+        # check if products are getting dropped
         for robot, pos_y, pos_x, product in state:
             if (pos_y, pos_x) == drop_zone and product:
                 dropped.append(product)

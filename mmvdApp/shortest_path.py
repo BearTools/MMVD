@@ -145,7 +145,7 @@ def build_path(start, finish, parent):
     return xs
 
 
-def a_star(map_, start_position, end_position):
+def a_star(map_, start_position, end_position, only_distance=False):
     """
     Find shortest path from ``start_position`` to ``end_position`` on the
     ``map_`` using A* (http://en.wikipedia.org/wiki/A*) algorithm.
@@ -156,6 +156,8 @@ def a_star(map_, start_position, end_position):
     :param array map_: warehouse map
     :param pair start_position: a ``(x, y)`` of current position on the map
     :param pair end_position: a ``(x, y)`` of final position on the map
+    :param bool only_distance: return only a distance between start position
+                               and end position
     :return: distance, iteration steps and actual path to the destination
     :raises PathUnreachable: if the algorithm is not able to find a path to the
                              destination
@@ -180,6 +182,9 @@ def a_star(map_, start_position, end_position):
         f, junk, current = heapq.heappop(heap)
 
         if current == end_position:
+            if only_distance:
+                return g[current]
+
             print "Distance: {}, steps: {}".format(g[current], step)
             return g[current], step, build_path(start_position, end_position,
                                                 link)
