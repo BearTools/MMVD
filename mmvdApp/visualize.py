@@ -160,6 +160,7 @@ class RobotVisualization:
                                        x0 + tile_size * 0.8,
                                        y0 - tile_size * 0.8,
                                        fill="purple")
+
     def _draw_shelf(self, x, y):
         """
         Draw shelf as small rectangle with character on top of it
@@ -264,6 +265,7 @@ class RobotVisualization:
 
     def done(self):
         """
-        Indicate that the animation is done so that we allow the user to close the window.
+        Indicate that the animation is done so that we allow the user to close
+        the window.
         """
         mainloop()

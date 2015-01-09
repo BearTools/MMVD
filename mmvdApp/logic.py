@@ -57,6 +57,21 @@ class Direction(object):
         self.down = down
         self.left = left
 
+    def __str__(self):
+        """
+        __str__ function has to be modified in a way so it is easy to save
+        it in a file as proposed in utils.py
+        """
+        text = '{:6s}{:2s}{:5s}'.format('Up', ' : ', str(self.get_up()))
+        text += '\n'
+        text += '{:6s}{:2s}{:5s}'.format('Right', ' : ', str(self.get_right()))
+        text += '\n'
+        text += '{:6s}{:2s}{:5s}'.format('Down', ' : ', str(self.get_down()))
+        text += '\n'
+        text += '{:6s}{:2s}{:5s}'.format('Left', ' : ', str(self.get_left()))
+        return text
+
+
 class Magazine(object):
     """
     Represents magazine as 2 dimensional array. each tile is marked with
@@ -92,7 +107,10 @@ class Magazine(object):
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.tiles = [[Tile(j, i, Direction()) for i in range(height)] for j in range(width)]
+        self.tiles = [
+            [Tile(j, i, Direction()) for i in range(height)]
+            for j in range(width)
+        ]
         self.robot_list = []
         self.shelf_list = []
         self.visualize = RobotVisualization
@@ -109,24 +127,31 @@ class Magazine(object):
         Very important function!
         Creates magazine based on content of array
         """
-        self.exit_points=[]
+        self.exit_points = []
         self.shelf_list = []
         for i in range(len(array)):
             for j in range(len(array[i])):
                 if array[i][j] == 1:
-                    self.get_tile(j, len(array)-i-1).set_direction(Direction(up=True))
+                    self.get_tile(j, len(array) - i - 1) \
+                        .set_direction(Direction(up=True))
                 elif array[i][j] == 2:
-                    self.get_tile(j, len(array)-i-1).set_direction(Direction(right=True))
+                    self.get_tile(j, len(array) - i - 1) \
+                        .set_direction(Direction(right=True))
                 elif array[i][j] == 3:
-                    self.get_tile(j, len(array)-i-1).set_direction(Direction(down=True))
+                    self.get_tile(j, len(array) - i - 1) \
+                        .set_direction(Direction(down=True))
                 elif array[i][j] == 4:
-                    self.get_tile(j, len(array)-i-1).set_direction(Direction(left=True))
+                    self.get_tile(j, len(array) - i - 1) \
+                        .set_direction(Direction(left=True))
                 elif array[i][j] == 9:
-                    self.exit_points.append((j, len(array)-i-1))
-                    self.get_tile(j, len(array)-1-i).set_direction(Direction())
+                    self.exit_points.append((j, len(array) - i - 1))
+                    self.get_tile(j, len(array) - 1 - i) \
+                        .set_direction(Direction())
                 else:
-                    self.shelf_list.append(Shelf(j, len(array)-1-i, array[i][j]))
-                    self.get_tile(j, len(array)-1-i).set_direction(Direction())
+                    self.shelf_list.append(Shelf(j, len(array) - 1 - i,
+                                                 array[i][j]))
+                    self.get_tile(j, len(array) - 1 - i) \
+                        .set_direction(Direction())
                     continue
 
         for robot_index in range(len(robot_array)):
@@ -134,10 +159,23 @@ class Magazine(object):
                 for robot in robot_array:
                     self.robot_list.append(Robot())
             self.robot_list[robot_index].set_x(robot_array[robot_index][0])
-            self.robot_list[robot_index].set_y(self.get_height()-1-robot_array[robot_index][1])
+            self.robot_list[robot_index] \
+                .set_y(self.get_height() - 1 - robot_array[robot_index][1])
+            if robot_array[robot_index][2] == 1:
+                self.robot_list[robot_index].set_direction(Direction(up=True))
+            elif robot_array[robot_index][2] == 2:
+                self.robot_list[robot_index] \
+                    .set_direction(Direction(right=True))
+            elif robot_array[robot_index][2] == 3:
+                self.robot_list[robot_index] \
+                    .set_direction(Direction(down=True))
+            elif robot_array[robot_index][2] == 4:
+                self.robot_list[robot_index] \
+                    .set_direction(Direction(left=True))
 
     def show(self):
-        self.visualize = RobotVisualization(self.get_width(),self.get_height())
+        self.visualize = RobotVisualization(self.get_width(),
+                                            self.get_height())
 
     def oldUpdate(self, map_, robot_array):
         self.build_from_array(map_, robot_array)
