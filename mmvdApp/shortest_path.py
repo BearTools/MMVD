@@ -17,16 +17,16 @@ def neighbors(map_, position, final=None, available_only=False,
     Return Von Neumann neighborhood of distance r=1.
 
     :param array map_: a warehouse map
-    :param pair position: a ``(x, y)`` of current position on the map
-    :param pair final: a ``(x, y)`` of final position on the map.  If this is
+    :param pair position: a ``(y, x)`` of current position on the map
+    :param pair final: a ``(y, x)`` of final position on the map.  If this is
                        specified, and final position is one of the neighbors,
                        it gets included in the results
     :param bool available_only: return only available moves (according to the
                                 traffic rules)
-    :param bool positions: return pairs ``(x, y)`` instead of values
+    :param bool positions: return pairs ``(y, x)`` instead of values
                            ``map_[y][x]``
     """
-    x, y = position
+    y, x = position
 
     # what's under position in the direction ↑→↓← of the current node
     up, right, down, left = 0, 0, 0, 0
@@ -34,16 +34,16 @@ def neighbors(map_, position, final=None, available_only=False,
 
     if x - 1 >= 0:
         left = map_[y][x - 1]
-        left_pos = (x - 1, y)
+        left_pos = (y, x - 1)
     if x + 1 < len(map_[x]):
         right = map_[y][x + 1]
-        right_pos = (x + 1, y)
+        right_pos = (y, x + 1)
     if y - 1 >= 0:
         up = map_[y - 1][x]
-        up_pos = (x, y - 1)
+        up_pos = (y - 1, x)
     if y + 1 < len(map_):
         down = map_[y + 1][x]
-        down_pos = (x, y + 1)
+        down_pos = (y + 1, x)
 
     results = [[True, up], [True, right], [True, down], [True, left]]
 
@@ -92,7 +92,7 @@ def neighbors(map_, position, final=None, available_only=False,
 
     # check if final position is in the closest neighborhood and it's a shelf
     if (positions and final and manhattan_dist(map_, position, final) == 1
-            and isinstance(map_[final[1]][final[0]], str)):
+            and isinstance(map_[final[0]][final[1]], str)):
         # ...and include it if so
         if final == up_pos:
             results[0][0] = True
@@ -104,7 +104,7 @@ def neighbors(map_, position, final=None, available_only=False,
             results[3][0] = True
 
     # return only directions that have True as the first element in pair
-    return tuple(map(lambda x: x[1], filter(lambda x: x[0], results)))
+    return tuple(map(lambda rv: rv[1], filter(lambda rv: rv[0], results)))
 
 
 def manhattan_dist(map_, start_position, end_position):
@@ -130,8 +130,8 @@ def build_path(start, finish, parent):
     Adapted from:
     http://dave.dkjones.org/posts/2012/2012-03-12-astar-python.html
 
-    :param pair start: a ``(x, y)`` of starting position on the map
-    :param pair finish: a ``(x, y)`` of finish position on the map
+    :param pair start: a ``(y, x)`` of starting position on the map
+    :param pair finish: a ``(y, x)`` of finish position on the map
     :param dict parent: a dictionary full of node=>parent mappings
     :return: chronological list of visited nodes, e.g.
              ``[(0, 0), (0, 1), ..., (2, 4)]``
@@ -154,8 +154,8 @@ def a_star(map_, start_position, end_position, only_distance=False):
     http://dave.dkjones.org/posts/2012/2012-03-12-astar-python.html
 
     :param array map_: warehouse map
-    :param pair start_position: a ``(x, y)`` of current position on the map
-    :param pair end_position: a ``(x, y)`` of final position on the map
+    :param pair start_position: a ``(y, x)`` of current position on the map
+    :param pair end_position: a ``(y, x)`` of final position on the map
     :param bool only_distance: return only a distance between start position
                                and end position
     :return: distance, iteration steps and actual path to the destination
