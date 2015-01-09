@@ -1,7 +1,7 @@
 # coding: utf-8
 
 """
-LP stands for Linear Programming.  Functions defined here are intended for
+LinProg stands for Linear Programming.  Functions defined here are intended for
 specific operational research calculations.
 """
 
