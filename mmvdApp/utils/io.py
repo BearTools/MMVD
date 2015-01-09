@@ -56,3 +56,13 @@ def read_robots_positions(name):
         starting_positions.append((y_pos, x_pos))
 
     return starting_positions
+
+
+def read_order(name):
+    """
+    Read a file with products sequence.  This sequence is important: our robots
+    have to bring products to the drop zone in this exact sequence.
+    """
+    with open(name, 'r') as f:
+        lines = process_lines(f.readlines())
+    return lines

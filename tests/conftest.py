@@ -1,5 +1,6 @@
 import pytest
-from mmvdApp.utils import read_warehouse_map, read_robots_positions
+from mmvdApp.utils import (read_warehouse_map, read_robots_positions,
+                           read_order, drop_zone)
 
 
 @pytest.fixture
@@ -20,15 +21,7 @@ def drop_zone1(warehouse_map1):
     """
     Find the drop zone coordinates.
     """
-    drop_zone = (-1, -1)
-
-    # TODO: can optimize by breaking the loop
-    for row_index, row in enumerate(warehouse_map1):
-        for column_index, point in enumerate(row):
-            if point == 9 or point == "9":
-                drop_zone = (row_index, column_index)
-
-    return drop_zone
+    return drop_zone(warehouse_map1)
 
 
 @pytest.fixture
@@ -43,11 +36,17 @@ def robots_positions1(tmpdir):
 
 
 @pytest.fixture
-def order1():
+def order1(tmpdir):
     """
     Specify requested order of products.
     """
-    return ["f", "b", "a"]
+    content = """f
+b
+a
+"""
+    file_ = tmpdir.join("warehouse1.map")
+    file_.write(content)
+    return read_order(str(file_))
 
 
 @pytest.fixture
