@@ -1,3 +1,4 @@
+# coding: utf-8
 from .utils.io import read_warehouse_map, read_robots_positions, read_order
 from .utils.map import drop_zone, products, distances
 from .utils.tabu import tabu_search

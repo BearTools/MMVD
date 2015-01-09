@@ -1,3 +1,4 @@
+# coding: utf-8
 import pytest
 
 from mmvdApp.utils import products, distances

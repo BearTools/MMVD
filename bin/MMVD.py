@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 # start application:
 # 1 load specified map

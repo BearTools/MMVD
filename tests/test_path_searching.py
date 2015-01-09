@@ -1,3 +1,4 @@
+# coding: utf-8
 import pytest
 
 from mmvdApp.shortest_path import neighbors

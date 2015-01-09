@@ -1,3 +1,4 @@
+# coding: utf-8
 import pytest
 from mmvdApp.utils import objective_function
 from mmvdApp.utils import valid_solution

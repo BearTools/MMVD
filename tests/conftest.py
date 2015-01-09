@@ -1,3 +1,4 @@
+# coding: utf-8
 import pytest
 from mmvdApp.utils import (read_warehouse_map, read_robots_positions,
                            read_order, drop_zone)

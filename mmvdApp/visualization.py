@@ -1,3 +1,4 @@
+# coding: utf-8
 __author__ = 'wojciech'
 
 from Tkinter import *
