@@ -1,6 +1,5 @@
 # coding: utf-8
 import heapq
-# from .memoize import memoize  # it's so shitty!
 
 
 class PathUnreachable(Exception):
