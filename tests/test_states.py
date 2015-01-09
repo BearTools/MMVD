@@ -21,4 +21,4 @@ def test_solution_validity(states1, order1, drop_zone1):
     """
     assert valid_solution(states1, order1, drop_zone1)
     # check for valid solution when one product isn't returned
-    assert valid_solution(states1[0:-1], order1, drop_zone1)
+    assert not valid_solution(states1[0:-1], order1, drop_zone1)
