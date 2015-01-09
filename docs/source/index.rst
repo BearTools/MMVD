@@ -15,6 +15,10 @@ Contents
    :maxdepth: 2
 
    installation
+   testing
+   robots_map
+   warehouse_map
+   visualization
    code
 
 
