@@ -35,7 +35,7 @@ requirements = open('requirements.txt').readlines()
 
 setup(
     name='mmvdApp',
-    version='0.1.0',
+    version='0.2.0',
 
     description='A robot-controlled warehouse simulator',
     long_description=readme,

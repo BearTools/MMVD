@@ -55,8 +55,8 @@ def distances(map, points, start_pos, end_pos):
     :param tuple start_pos: tuple with route beginning point: `(y, x)`
     :param tuple end_pos: tuple with route beginning point: `(y, x)`
     :rtype: list
-    :return: List of tuples with distances from :param:`start_pos` to each
-             point and from each point to :param:`end_pos`
+    :return: List of tuples with distances from parameter `start_pos` to each
+             point and from each point to parameter `end_pos`
     """
     d = []
     for point in points:

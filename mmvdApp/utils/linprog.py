@@ -11,7 +11,7 @@ def valid_solution(solution, order, drop_zone):
     Check validity of a given solution sequence.
 
     Solution is valid if and only if products are dropped in drop-zone in order
-    specified by :param:`order`.
+    specified by parameter `order`.
 
     :rtype: boolean
     :return: check if solution is valid
