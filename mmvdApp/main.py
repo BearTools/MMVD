@@ -1,6 +1,5 @@
 from .utils.io import read_warehouse_map, read_robots_positions, read_order
-from .utils.shortest_path import a_star
-from .utils.map import drop_zone, products
+from .utils.map import drop_zone, products, distances
 from .utils.tabu import tabu_search
 from .logic import Magazine
 
@@ -22,14 +21,10 @@ def run_application(warehouse_filename, robots_filename, order_filename):
     order = read_order(order_filename)
 
     # calculate distances
-    product_distances = []
-    drop_zone_location = drop_zone(map)
-    for product in products(map, order):
-        distance_to = a_star(map, drop_zone_location, product,
-                             only_distance=True)
-        distance_from = a_star(map, product, drop_zone_location,
-                               only_distance=True)
-        product_distances.append((distance_to, distance_from))
+    drop_zone_coords = drop_zone(map)
+    product_distances = distances(map, products(map, order),
+                                  start_pos=drop_zone_coords,
+                                  end_pos=drop_zone_coords)
 
     # start tabu loop
     result, steps = tabu_search(map, robots, order, product_distances)
