@@ -44,6 +44,9 @@ def order1(tmpdir):
     content = """f
 b
 a
+c
+d
+e
 """
     file_ = tmpdir.join("warehouse1.map")
     file_.write(content)

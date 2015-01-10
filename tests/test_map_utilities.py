@@ -27,8 +27,8 @@ def test_products_coords(warehouse_map1, order1):
     """
     coords = products(warehouse_map1, order1)
 
-    # order1 == ['f', 'b', 'a']
-    assert coords == [(3, 3), (1, 3), (1, 1)]
+    # order1 == ['f', 'b', 'a', 'c', 'd', 'e']
+    assert coords == [(3, 3), (1, 3), (1, 1), (2, 1), (2, 3), (3, 1)]
 
 
 @pytest.mark.utils
@@ -41,4 +41,4 @@ def test_products_distances(warehouse_map1, order1, drop_zone1):
     # test distances from drop zone to products and back
     D = distances(warehouse_map1, products(warehouse_map1, order1),
                   start_pos=drop_zone1, end_pos=drop_zone1)
-    assert D == [(2, 2), (6, 4), (6, 8)]
+    assert D == [(2, 2), (6, 4), (6, 8), (5, 9), (5, 3), (4, 10)]
