@@ -21,6 +21,10 @@ def test_solution_validity(states1, order1, drop_zone1):
     Test if ``utils.linprog.valid_solution`` correctly checks for valid
     solution.
     """
-    assert valid_solution(states1, order1, drop_zone1)
+    # cut order in half because states1 is intended only for first 3 products
+    order = order1[0:3]
+
+    assert valid_solution(states1, order, drop_zone1)
+
     # check for valid solution when one product isn't returned
-    assert not valid_solution(states1[0:-1], order1, drop_zone1)
+    assert not valid_solution(states1[0:-1], order, drop_zone1)
