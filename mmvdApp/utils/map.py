@@ -7,6 +7,10 @@ from ..shortest_path import a_star
 def drop_zone(map):
     """
     Find the drop zone coordinates.
+
+    :param array map: a warehouse map
+    :return: coordinates of the drop zone
+    :rtype: pair ``(y, x)``
     """
     dz = (-1, -1)
 
@@ -22,6 +26,12 @@ def drop_zone(map):
 def products(map, order):
     """
     Find coordinates for each product in order.
+
+    :param array map: a warehouse map
+    :param list order: a specific sequence of products
+    :return: coordinates for products in the same sequence as they are
+             specified in ``order``
+    :rtype: list of pairs ``(y, x)``
     """
     # CAUTION:
     # Make sure to return coordinates in the same order as corresponding
@@ -51,12 +61,12 @@ def distances(map, points, start_pos, end_pos):
 
     :param array map: a warehouse map
     :param list points: a list of tuples with 2 elements:
-                        `[(0, 1), (1, 1), ...]`
-    :param tuple start_pos: tuple with route beginning point: `(y, x)`
-    :param tuple end_pos: tuple with route beginning point: `(y, x)`
-    :rtype: list
-    :return: List of tuples with distances from parameter `start_pos` to each
-             point and from each point to parameter `end_pos`
+                        ``[(0, 1), (1, 1), ...]``
+    :param tuple start_pos: tuple with route beginning point: ``(y, x)``
+    :param tuple end_pos: tuple with route beginning point: ``(y, x)``
+    :rtype: list of pairs
+    :return: list of tuples with distances from parameter ``start_pos`` to each
+             point and from each point to parameter ``end_pos``
     """
     d = []
     for point in points:
