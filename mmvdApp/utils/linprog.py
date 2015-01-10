@@ -6,7 +6,7 @@ specific operational research calculations.
 """
 
 
-def valid_solution(solution, order, drop_zone):
+def valid_solution(solution, order, dropzone):
     """
     Check validity of a given solution sequence.
 
@@ -22,7 +22,7 @@ def valid_solution(solution, order, drop_zone):
     for state in solution:
         # check if products are getting dropped
         for robot, pos_y, pos_x, product in state:
-            if (pos_y, pos_x) == drop_zone and product:
+            if (pos_y, pos_x) == dropzone and product:
                 dropped.append(product)
 
     # check if dropped products appear in the same order as they should

@@ -144,6 +144,7 @@ def build_path(start, finish, parent):
     return xs
 
 
+# TODO: add memoization
 def a_star(map_, start_position, end_position, only_distance=False):
     """
     Find shortest path from ``start_position`` to ``end_position`` on the
