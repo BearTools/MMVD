@@ -1,21 +1,19 @@
 # coding: utf-8
 import pytest
 
-from mmvdApp.logic import Direction
-from mmvdApp.logic import Robot
-from mmvdApp.logic import Magazine
 from mmvdApp.visualization import Visualization
+
 
 @pytest.mark.frontend
 def test_magazine_class():
     map_ = \
-            [
-                [2, 2, 2, 2, 3],
-                [1, "a", 3, "b", 3],
-                [1, "c", 3, "d", 3],
-                [1, "e", 3, "f", 3],
-                [1, 4, 4, 4, 9],
-                ]
+        [
+            [2, 2, 2, 2, 3],
+            [1, "a", 3, "b", 3],
+            [1, "c", 3, "d", 3],
+            [1, "e", 3, "f", 3],
+            [1, 4, 4, 4, 9],
+        ]
     app = Visualization(map_)
     robots = ((0, 0), (1, 1), (2, 3), (4, 2))
     app.draw_robots(robots)
