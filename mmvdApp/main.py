@@ -18,7 +18,7 @@ def run_application(warehouse_filename, robots_filename, order_filename):
     - represent results
     """
     map = read_warehouse_map(warehouse_filename)
-    robots = read_robots_positions(robots_filename)
+    robot_positions = read_robots_positions(robots_filename)
     order = read_order(order_filename)
 
     # calculate distances
@@ -28,6 +28,9 @@ def run_application(warehouse_filename, robots_filename, order_filename):
                                   end_pos=drop_zone_coords)
 
     # start tabu loop
+
+    # if there are 4 robots, create list [0, 1, 2, 3]
+    robots = range(len(robot_positions))
     result, steps = tabu_search(map, robots, order, product_distances)
 
     # representing results
