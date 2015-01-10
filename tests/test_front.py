@@ -4,70 +4,42 @@ import pytest
 from mmvdApp.logic import Direction
 from mmvdApp.logic import Robot
 from mmvdApp.logic import Magazine
-
-
-@pytest.mark.frontend
-def test_direction_class():
-    direction = Direction()
-    assert direction.get_up() is False
-    direction.set_up(True)
-    assert direction.get_up() is True
-    direction.set_down(True)
-    assert direction.get_down() is True
-    assert direction.get_direction_list() == [True, False, True, False]
-
-
-@pytest.mark.frontend
-def test_robot_class():
-    robot = Robot()
-    direction_list = robot.get_direction().get_direction_list()
-    assert direction_list == [False, False, False, False]
-    robot.set_y(4)
-    assert robot.get_y() == 4
-    robot.set_direction(Direction(up=True, left=True))
-    assert robot.get_direction().get_direction_list() == [True, False, False,
-                                                          True]
-
+from mmvdApp.visualization import Visualization
 
 @pytest.mark.frontend
 def test_magazine_class():
-    # TODO: add some assertions here?!
-    magazine = Magazine(5, 6)
-    magazine.show()
-    robot_array = ([[0, 1, 2, None],
-                   [3, 2, 1, None]])
-    arr = (
-        [
-            [2, 2, 2, 2, 3],
-            [1, "a", 1, "B", 3],
-            [1, "c", 1, "d", 3],
-            [1, "e", 1, "f", 3],
-            [1, "g", "h", "i", 3],
-            [1, 4, 4, 4, 9],
-        ]
-    )
-    magazine.update(arr, robot_array)
-    arr = (
-        [
-            [2, 2, 2, 2, 3],
-            [1, "a", 1, "b", 3],
-            [1, "c", 1, "d", 3],
-            [1, "e", 1, "f", 3],
-            [1, "g", 4, "i", 3],
-            [1, 4, 4, 9, 1],
-        ]
-    )
-    magazine.update(arr, robot_array)
-    arr = (
-        [
-            [2, 2, 2, 2, 3],
-            [1, "a", 1, "H", 3],
-            [1, "c", 1, "d", 3],
-            [1, "e", 1, "f", 3],
-            [1, 4, 4, 3, 3],
-            [1, 1, 9, 1, 1],
-        ]
-    )
-    magazine.update(arr, robot_array)
-    # TODO: for some strange reason, .end() only keeps application running
-    # magazine.end()
+    map_ = \
+            [
+                [2, 2, 2, 2, 3],
+                [1, "a", 3, "b", 3],
+                [1, "c", 3, "d", 3],
+                [1, "e", 3, "f", 3],
+                [1, 4, 4, 4, 9],
+                ]
+    app = Visualization(map_)
+    robots = ((0, 0), (1, 1), (2, 3), (4, 2))
+    app.draw_robots(robots)
+    app.animate([[0, 2], [1, 2], [2, 3], [3, 3]], [["a", 3]])
+    app.animate([[0, 2], [1, 3], [2, 4], [3, 3]], [["b", 0]])
+    app.animate([[0, 2], [1, 3], [2, 4], [3, 4]], [["c", 0]])
+    app.animate([[0, 2], [1, 3], [2, 1]], [["d", 2]])
+    # new robots are given new id numbers
+    app.draw_robots(robots)
+    # in order to move new robots one has to use proper id
+    app.animate([[4, 2], [5, 3], [6, 1]], [["d", 2]])
+    app.animate([[0, 3]], [])
+    app.animate([[0, 3]], [])
+    app.animate([[0, 3]], [])
+    app.animate([[0, 3]], [])
+    app.animate([[0, 4]], [])
+    app.animate([[0, 4]], [])
+    app.animate([[0, 4]], [])
+    app.animate([[0, 4]], [])
+    app.animate([[0, 1]], [])
+    app.animate([[0, 1]], [])
+    app.animate([[0, 1]], [])
+    app.animate([[0, 1]], [])
+    app.animate([[0, 2]], [])
+    app.animate([[0, 2]], [])
+    app.animate([[0, 2]], [])
+    app.animate([[0, 2]], [])
