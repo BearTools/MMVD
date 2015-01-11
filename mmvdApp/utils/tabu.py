@@ -1,7 +1,8 @@
 # coding: utf-8
 import itertools
-import Queue
+import collections
 import heapq
+import random
 
 from .linprog import objective_function, valid_solution
 from .map import drop_zone
@@ -32,29 +33,96 @@ def initial_solution(robots, order):
 
 
 # TODO: implement with memoize decorator?
-def generate_solution(map, robot_positions, product_positions, order, dropzone,
-                      assignment):
+# TODO: split this into multiple smaller functions?
+def generate_solution(map_, robot_positions, product_positions, order,
+                      dropzone, assignment):
     """
     Generate solution steps (states) that form a valid solution (see
     :func:`mmvdApp.utils.linprog.valid_solution`).
 
-    :param array map:
-    :param robot_positions:
-    :param product_positions:
-    :param order:
-    :param dropzone:
-    :param assignment:
-    :return:
-    :rtype:
+    :param array map_: warehouse map
+    :param list robot_positions: starting positions of the robots
+    :param list product_positions: positions where products are located
+    :param list order: sequence of products to be delivered
+    :param tuple dropzone: coords of drop-zone
+    :param list assignment: robots → products assignment
+    :return: states for specific solution
+    :rtype: list
     """
+    distances = {}
+    routes = []
+
     # for each robot at each starting position generate route to the assigned
     # product
     for product_index, robot_index in enumerate(assignment):
         # product_positions - the same order as in `order`
-        distance1, _, route1 = a_star(map, robot_positions[robot_index],
+        pos_y, pos_x = robot_positions[robot_index]
+
+        # How many steps should wait at starting position.
+        # Only 1 robot can start at one time, others have to wait to avoid
+        # collisions.
+        delay = [(robot_index, pos_y, pos_x, None), ] * robot_index
+
+        distance1, _, route1 = a_star(map_, robot_positions[robot_index],
                                       product_positions[product_index])
-        distance2, _, route2 = a_star(map, product_positions[product_index],
+        distance2, _, route2 = a_star(map_, product_positions[product_index],
                                       dropzone)
+
+        distances[product_index] = distance1 + distance2
+        # distances[product_index] = (len(delay), distance1, distance2)
+
+        # Calculate wait time.
+        # Robot waits on assigned product position because it has to get to the
+        # drop zone in specific time.  This means robot cannot outpace any
+        # other robot that should get faster to the drop zone.
+        if product_index > 0:
+            pos_y, pos_x = route1[-1]
+            M = distances[product_index - 1] - distances[product_index]
+            wait = [(robot_index, pos_y, pos_x, order[product_index]), ] * M
+            distances[product_index] = distance1 + distance2 + M
+        else:
+            wait = []
+
+        # Convert routes to states
+        states1 = []
+        states2 = []
+        for pos_y, pos_x in route1:
+            # Last item in state tuple is reserved for "carried" product.
+            # Robot doesn't have the product until it reaches product's
+            # position
+            if product_positions[product_index] == (pos_y, pos_x):
+                pass
+                states1.append((robot_index, pos_y, pos_x,
+                               order[product_index]))
+            else:
+                states1.append((robot_index, pos_y, pos_x, None))
+        for pos_y, pos_x in route2:
+            states2.append((robot_index, pos_y, pos_x, order[product_index]))
+
+        # join routes from the same robots
+        # Quite common situation is when there are more products in order than
+        # robots in warehouse.  Generated solution does not group routes by
+        # robot.
+        extended = False
+        for k, v in enumerate(routes):
+            if v[0][0] == robot_index:
+                extended = True
+                routes[k].extend(delay + states1 + wait + states2)
+
+        if not extended:
+            routes.append(delay + states1 + wait + states2)
+
+    # to each robot's routes add drop-zone wait
+    longest = max(map(len, routes))
+    for k, v in enumerate(routes):
+        difference = longest - len(v)  # difference is always >= 0
+        if difference:
+            x = v[-1]
+            routes[k].extend([(x[0], x[1], x[2], None)] * difference)
+
+    # convert routes for individual robots into one list of states that valid
+    # solution consists of
+    return zip(*routes)
 
 
 def neighborhoods(solution):
@@ -66,15 +134,32 @@ def neighborhoods(solution):
     :rtype: list
     """
     # TODO: come up with some neighborhoods
-    return [solution]
+
+    # randomly select a robot and generate swap with one robot before and one
+    # after
+    V = len(solution)
+    i = random.choice(range(V))
+    i_1 = (i - 1) % V
+    i_2 = (i + 1) % V
+    sol1 = solution[:]
+    sol1[i] = solution[i_1]
+    sol1[i_1] = solution[i]
+    sol2 = solution[:]
+    sol2[i] = solution[i_2]
+    sol2[i_2] = solution[i]
+    return [sol1, solution, sol2]
 
 
-def best_candidate(candidates, order, dropzone):
+def best_candidate(map_, robot_positions, product_positions, candidates, order,
+                   dropzone):
     """
     Select the best (robots → products) arrangement from all candidates.
     :func:`mmvdApp.utils.linprog.objective_function` provides a way to measure
     "fitness" of given arrangement.
 
+    :param array map_: warehouse map
+    :param list robot_positions: starting positions of the robots
+    :param list product_positions: positions where products are located
     :param candidates: robot indices.  For example, a candidate ``[1, 2, 0]``
                        means "robot #1 should fetch product #0, robot #2 should
                        fetch product #1, robot #0 should fetch product #2".
@@ -88,7 +173,8 @@ def best_candidate(candidates, order, dropzone):
     """
     rv = []
     for candidate in candidates:
-        solution = generate_solution(candidate, order)
+        solution = generate_solution(map_, robot_positions, product_positions,
+                                     order, dropzone, candidate)
         if valid_solution(solution, order, dropzone):
             objective = objective_function(solution)
             heapq.heappush(rv, (objective, candidate, solution))
@@ -114,7 +200,8 @@ def features(previous, current):
     return rv
 
 
-def tabu_search(map, robots, order, product_distances):
+def tabu_search(map_, robot_positions, product_positions, order,
+                product_distances):
     """
     Compute best (not necessarily optimal) arrangement (robots → products),
     that is both valid (see :func:`mmvdApp.utils.linprog.valid_solution`) and
@@ -124,10 +211,9 @@ def tabu_search(map, robots, order, product_distances):
     Computation is done using
     `Tabu search algorithm <http://en.wikipedia.org/wiki/Tabu_search>`_.
 
-    :param array map: a warehouse map
-    :param list robots: list of indices, for example: ``[0, 1, 2, 3]``.  This
-                        means there are 4 robots that start from the drop zone
-                        in this particular order.
+    :param array map_: a warehouse map
+    :param list robot_positions: starting positions of the robots
+    :param list product_positions: positions where products are located
     :param list order: a specific sequence of products that have to be dropped
                        in the dropzone in this specific order
     :param list product_distances: a helper list of distance tuples
@@ -141,16 +227,20 @@ def tabu_search(map, robots, order, product_distances):
     """
     MAX_ITERATIONS = 10**3
     MAX_TABU_SIZE = 5
+    dropzone = drop_zone(map_)
 
-    solution = initial_solution(robots, order)
+    solution = initial_solution(range(len(robot_positions)), order)
     best_solution = solution[:]  # copy of solution
 
     result = objective_function(solution)
     best_result = result
 
-    tabu_list = Queue.Queue(maxsize=MAX_TABU_SIZE)
+    best_solution_steps = generate_solution(map_, robot_positions,
+                                            product_positions, order, dropzone,
+                                            best_solution)
 
-    dropzone = drop_zone(map)
+    tabu_list = collections.deque(maxlen=MAX_TABU_SIZE)
+
 
     i = 0
     while i < MAX_ITERATIONS:
@@ -163,15 +253,15 @@ def tabu_search(map, robots, order, product_distances):
 
         # best_candidate returns (result, candidate, solution_steps) tuple, but
         # we're not interested in the last one
-        result, solution, _ = best_candidate(candidates, order, dropzone)
+        result, solution, steps = best_candidate(map_, robot_positions,
+                                                 product_positions, candidates,
+                                                 order, dropzone)
         if result < best_result:
             previous_solution = best_solution[:]
             best_solution = solution[:]
             best_result = result
+            best_solution_steps = steps[:]
 
-            if tabu_list.full():
-                tabu_list.get_nowait()
+            tabu_list.append(features(previous_solution, solution))
 
-            tabu_list.put_nowait(features(previous_solution, solution))
-
-    return best_result, best_solution
+    return best_result, best_solution, best_solution_steps

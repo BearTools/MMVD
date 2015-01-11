@@ -1,6 +1,6 @@
 # coding: utf-8
 import pytest
-from mmvdApp.utils.tabu import initial_solution, features
+from mmvdApp.utils.tabu import initial_solution, features, neighborhoods
 
 
 @pytest.mark.utils
@@ -19,3 +19,12 @@ def test_initial_solution(robots_positions1, order1):
 ])
 def test_tabu_features(previous, current, tabu):
     assert features(previous, current) == tabu
+
+
+@pytest.mark.utils
+@pytest.mark.tabu
+def test_tabu_neighborhoods():
+    M = ["a", "b", "c"]
+    N = neighborhoods(M)
+    assert len(N) == 2
+    assert M not in N
