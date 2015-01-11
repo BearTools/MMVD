@@ -185,7 +185,8 @@ def a_star(map_, start_position, end_position, only_distance=False):
             if only_distance:
                 return g[current]
 
-            print "Distance: {}, steps: {}".format(g[current], step)
+            # TODO: add logging
+            # print "Distance: {}, steps: {}".format(g[current], step)
             return g[current], step, build_path(start_position, end_position,
                                                 link)
 
