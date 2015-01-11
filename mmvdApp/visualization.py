@@ -217,11 +217,12 @@ class Visualization(Frame):
         """
 
         for robot in robot_list:
+            pos_y, pos_x = robot
             self.canvas.create_oval(
-                robot[0] * self.tile_len + self.tile_len * 0.2,
-                robot[1] * self.tile_len + self.tile_len * 0.2,
-                robot[0] * self.tile_len + self.tile_len * 0.8,
-                robot[1] * self.tile_len + self.tile_len * 0.8,
+                pos_x * self.tile_len + self.tile_len * 0.2,
+                pos_y * self.tile_len + self.tile_len * 0.2,
+                pos_x * self.tile_len + self.tile_len * 0.8,
+                pos_y * self.tile_len + self.tile_len * 0.8,
                 fill="blue", tag="robot" + str(self.robot_number)
             )
             self.robot_number += 1
@@ -236,6 +237,16 @@ class Visualization(Frame):
         """
         self.canvas.lower("shelf" + shelf_id)
         self.canvas.lower("shelf_text" + shelf_id)
+
+    def hide_robot(self, robot_id):
+        """
+        Removes robot with robot_id from view.
+        Robot is not removed from memory.
+        When moved appears in the magazine
+        :param robot_id: name of shelf to be hidden
+        :return:
+        """
+        self.canvas.lower("robot" + str(robot_id))
 
     def animate(self, update_robots, update_shelfs):
         """
@@ -261,38 +272,85 @@ class Visualization(Frame):
 
         for i in range(self.tile_len):
             time.sleep(.05/self.robotspeed)
-            for shelf in update_shelfs:
-                horizontal = 0
-                vertical = 0
-                if shelf[1] == 1:
-                    vertical = -1
-                elif shelf[1] == 2:
-                    horizontal = 1
-                elif shelf[1] == 3:
-                    vertical = 1
-                elif shelf[1] == 4:
-                    horizontal = -1
-                if shelf[1] == 0:
-                    self.hide_shelf(shelf[0])
+            for shelf, direction in update_shelfs:
+                if isinstance(direction, tuple):
+                    # move to absolute position
+                    # CAUTION: axes are reversed, ie. direction = (yPos, xPos)
+                    pos_y, pos_x = direction
+                    # self.canvas.moveTo("shelf" + shelf, direction[1],
+                    #                    direction[0])
+                    self.canvas.coords(
+                        "shelf" + shelf,
+                        pos_x * self.tile_len + 0.25 * self.tile_len,
+                        pos_y * self.tile_len + 0.25 * self.tile_len,
+                        pos_x * self.tile_len + 0.75 * self.tile_len,
+                        pos_y * self.tile_len + 0.75 * self.tile_len,
+                    )
+                    # self.canvas.moveTo("shelf_text" + shelf, direction[1],
+                    #                    direction[0])
+                    self.canvas.coords(
+                        "shelf_text" + shelf,
+                        pos_x * self.tile_len + 0.5 * self.tile_len,
+                        pos_y * self.tile_len + 0.5 * self.tile_len,
+                    )
+                    self.canvas.tag_raise("shelf" + shelf)
+                    self.canvas.tag_raise("shelf_text" + shelf)
                 else:
-                    self.canvas.move('shelf' + shelf[0], horizontal, vertical)
-                    self.canvas.move('shelf_text' + shelf[0], horizontal,
-                                     vertical)
-                    self.canvas.tag_raise("shelf"+shelf[0])
-                    self.canvas.tag_raise("shelf_text"+shelf[0])
+                    horizontal = 0
+                    vertical = 0
+                    if direction == 1:
+                        vertical = -1
+                    elif direction == 2:
+                        horizontal = 1
+                    elif direction == 3:
+                        vertical = 1
+                    elif direction == 4:
+                        horizontal = -1
 
-            for robot in update_robots:
-                horizontal = 0
-                vertical = 0
-                if robot[1] == 1:
-                    vertical = -1
-                elif robot[1] == 2:
-                    horizontal = 1
-                elif robot[1] == 3:
-                    vertical = 1
-                elif robot[1] == 4:
-                    horizontal = -1
-                self.canvas.move('robot' + str(robot[0]), horizontal, vertical)
+                    if direction == 0:
+                        self.hide_shelf(shelf)
+                    else:
+                        self.canvas.move('shelf' + shelf, horizontal,
+                                         vertical)
+                        self.canvas.move('shelf_text' + shelf, horizontal,
+                                         vertical)
+                        self.canvas.tag_raise("shelf" + shelf)
+                        self.canvas.tag_raise("shelf_text" + shelf)
+
+            for robot, direction in update_robots:
+                if isinstance(direction, tuple):
+                    # move to absolute position
+                    # CAUTION: axes are reversed, ie. direction = (yPos, xPos)
+                    pos_y, pos_x = direction
+                    # self.canvas.moveTo("robot" + str(robot), direction[1],
+                    #                    direction[0])
+                    self.canvas.coords(
+                        "robot" + str(robot),
+                        pos_x * self.tile_len + self.tile_len * 0.2,
+                        pos_y * self.tile_len + self.tile_len * 0.2,
+                        pos_x * self.tile_len + self.tile_len * 0.8,
+                        pos_y * self.tile_len + self.tile_len * 0.8,
+                    )
+                else:
+                    horizontal = 0
+                    vertical = 0
+                    if direction == 1:
+                        vertical = -1
+                    elif direction == 2:
+                        horizontal = 1
+                    elif direction == 3:
+                        vertical = 1
+                    elif direction == 4:
+                        horizontal = -1
+
+                    self.canvas.move('robot' + str(robot), horizontal, vertical)
+                    # if direction == 0:
+                    #     # print "robot hiding"
+                    #     pass
+                    #     self.hide_robot(robot)
+                    # else:
+                    #     self.canvas.move('robot' + str(robot), horizontal,
+                    #                      vertical)
             self.canvas.update()
             # time.clock().
         self.resize_magazine(self.variable.get())
