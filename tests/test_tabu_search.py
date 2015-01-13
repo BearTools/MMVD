@@ -1,13 +1,18 @@
 # coding: utf-8
 import pytest
 from mmvdApp.utils.tabu import initial_solution, features, neighborhoods
+from mmvdApp.utils.tabu import generate_solution
+from mmvdApp.utils.linprog import (valid_solution, RobotCollisionException,
+                                   InvalidOrderException)
 
 
 @pytest.mark.utils
 @pytest.mark.tabu
-def test_initial_solution(robots_positions1, order1):
+def test_initial_solution(robots_positions1, order1, drop_zone1):
     robots = range(len(robots_positions1))
-    assert initial_solution(robots, order1) == [0, 1, 2, 0, 1, 2]
+    solution = initial_solution(robots, order1)
+    assert solution == [0, 1, 2, 0, 1, 2]
+    assert valid_solution(solution, order1, drop_zone1)
 
 
 @pytest.mark.utils
@@ -26,5 +31,58 @@ def test_tabu_features(previous, current, tabu):
 def test_tabu_neighborhoods():
     M = ["a", "b", "c"]
     N = neighborhoods(M)
-    assert len(N) == 2
-    assert M not in N
+    assert len(N) == 3
+    assert M in N
+
+
+@pytest.mark.utils
+@pytest.mark.tabu
+@pytest.mark.regression
+@pytest.mark.parametrize("solution", [
+    [0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1],
+    [2, 2, 2, 2, 2, 2],
+    [0, 0, 0, 0, 1, 2],
+    [1, 1, 1, 1, 2, 0],
+    [2, 2, 2, 2, 0, 1],
+    [0, 1, 2, 0, 1, 2],
+    [0, 1, 0, 2, 1, 2],
+])
+def test_tabu_yield_valid_solution(warehouse_map1, robots_positions1, order1,
+                                   product_positions1, drop_zone1, solution):
+    steps = generate_solution(warehouse_map1, robots_positions1,
+                              product_positions1, order1, drop_zone1, solution)
+
+    import pprint
+    pprint.pprint(steps)
+    print len(steps)
+    assert valid_solution(steps, order1, drop_zone1)
+
+
+@pytest.mark.utils
+@pytest.mark.tabu
+@pytest.mark.regression
+@pytest.mark.randomness
+def test_tabu_yield_valid_solution_random(warehouse_map1, robots_positions1,
+                                          order1, product_positions1,
+                                          drop_zone1):
+    initial = initial_solution(range(len(robots_positions1)), order1)
+    steps = generate_solution(warehouse_map1, robots_positions1,
+                              product_positions1, order1, drop_zone1, initial)
+    import pprint
+    pprint.pprint(steps)
+    print len(steps)
+    assert valid_solution(steps, order1, drop_zone1)
+
+    for i in range(20):
+        for neighbor in neighborhoods(initial):
+            if neighbor != initial:
+                print "************"
+                print i, neighbor
+                steps = generate_solution(warehouse_map1, robots_positions1,
+                                          product_positions1, order1,
+                                          drop_zone1, neighbor)
+                import pprint
+                pprint.pprint(steps)
+                print len(steps)
+                assert valid_solution(steps, order1, drop_zone1)

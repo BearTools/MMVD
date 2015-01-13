@@ -5,6 +5,7 @@ import heapq
 import random
 
 from .linprog import objective_function, valid_solution
+from .linprog import RobotCollisionException, InvalidOrderException
 from .map import drop_zone
 from ..shortest_path import a_star
 
@@ -32,8 +33,8 @@ def initial_solution(robots, order):
     return arrangement
 
 
-# TODO: implement with memoize decorator?
 # TODO: split this into multiple smaller functions?
+# TODO: better calculation of wait times
 def generate_solution(map_, robot_positions, product_positions, order,
                       dropzone, assignment):
     """
@@ -49,7 +50,8 @@ def generate_solution(map_, robot_positions, product_positions, order,
     :return: states for specific solution
     :rtype: list
     """
-    distances = {}
+    # distances = {}
+    last_iteration_number = []
     routes = []
 
     # for each robot at each starting position generate route to the assigned
@@ -58,44 +60,80 @@ def generate_solution(map_, robot_positions, product_positions, order,
         # product_positions - the same order as in `order`
         pos_y, pos_x = robot_positions[robot_index]
 
-        # How many steps should wait at starting position.
-        # Only 1 robot can start at one time, others have to wait to avoid
-        # collisions.
-        delay = [(robot_index, pos_y, pos_x, None), ] * robot_index
-
         distance1, _, route1 = a_star(map_, robot_positions[robot_index],
                                       product_positions[product_index])
         distance2, _, route2 = a_star(map_, product_positions[product_index],
                                       dropzone)
 
-        distances[product_index] = distance1 + distance2
+        # How many steps should wait at starting position.
+        # Only 1 robot can start at one time, others have to wait to avoid
+        # collisions.
+        # Number of time to wait is calculated by measuring how many steps will
+        # it take current robot to grab a product and go to dropzone.  Then
+        # this number should be precisely 1 higher than drop-off step for the
+        # robot with previous product, unless even without wait time it takes
+        # current robot longer to reach drop-off step.
+        delay_time = 0
+        delay = []
+
+        cumulated_time = 0
+        for r_id, t in last_iteration_number:
+            if r_id == robot_index:
+                cumulated_time = t + 1
+
+        if product_index > 0:
+            _, delay_time = last_iteration_number[product_index - 1]
+            delay_time += 1
+            delay_time -= cumulated_time + distance1 + distance2
+            if delay_time < 0:
+                delay_time = 0
+
+            while ((routes[-1][delay_time][1], routes[-1][delay_time][2])
+                   == (pos_y, pos_x)):
+                delay_time += 1
+
+            delay = [(robot_index, pos_y, pos_x, None), ] * delay_time
+
+            # print (product_index,
+            #        last_iteration_number[product_index - 1][1],
+            #        distance1, distance2)
+            # if robot_index == 1:
+            #     print last_iteration_number[product_index - 1][1], distance1,
+            #           distance2
+            #     print last_iteration_number
+
+        last_iteration_number.append(
+            (robot_index, cumulated_time + delay_time + distance1 + distance2)
+        )
+
+        # print product_index, delay_time, distance1, distance2, cumulated_time
+        # print last_iteration_number
+        # print "***************"
         # distances[product_index] = (len(delay), distance1, distance2)
 
         # Calculate wait time.
         # Robot waits on assigned product position because it has to get to the
         # drop zone in specific time.  This means robot cannot outpace any
         # other robot that should get faster to the drop zone.
-        if product_index > 0:
-            pos_y, pos_x = route1[-1]
-            M = distances[product_index - 1] - distances[product_index]
-            wait = [(robot_index, pos_y, pos_x, order[product_index]), ] * M
-            distances[product_index] = distance1 + distance2 + M
-        else:
-            wait = []
+        wait = []
+        # if product_index > 0:
+        #     pos_y, pos_x = route1[-1]
+        #     M = distances[product_index - 1] - distances[product_index]
+        #     wait = [(robot_index, pos_y, pos_x, order[product_index]), ] * M
+        #     distances[product_index] = distance1 + distance2 + M
+        # else:
+        #     wait = []
 
         # Convert routes to states
-        states1 = []
+        states1 = [(robot_index, pos_y, pos_x, None)]  # initial position
         states2 = []
         for pos_y, pos_x in route1:
             # Last item in state tuple is reserved for "carried" product.
             # Robot doesn't have the product until it reaches product's
             # position
-            if product_positions[product_index] == (pos_y, pos_x):
-                pass
-                states1.append((robot_index, pos_y, pos_x,
-                               order[product_index]))
-            else:
+            if product_positions[product_index] != (pos_y, pos_x):
                 states1.append((robot_index, pos_y, pos_x, None))
+
         for pos_y, pos_x in route2:
             states2.append((robot_index, pos_y, pos_x, order[product_index]))
 
@@ -175,9 +213,12 @@ def best_candidate(map_, robot_positions, product_positions, candidates, order,
     for candidate in candidates:
         solution = generate_solution(map_, robot_positions, product_positions,
                                      order, dropzone, candidate)
-        if valid_solution(solution, order, dropzone):
-            objective = objective_function(solution)
-            heapq.heappush(rv, (objective, candidate, solution))
+        try:
+            if valid_solution(solution, order, dropzone):
+                objective = objective_function(solution)
+                heapq.heappush(rv, (objective, candidate, solution))
+        except (RobotCollisionException, InvalidOrderException):
+            pass
     return heapq.heappop(rv)
 
 
@@ -240,7 +281,6 @@ def tabu_search(map_, robot_positions, product_positions, order,
                                             best_solution)
 
     tabu_list = collections.deque(maxlen=MAX_TABU_SIZE)
-
 
     i = 0
     while i < MAX_ITERATIONS:
