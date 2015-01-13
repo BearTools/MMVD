@@ -141,7 +141,7 @@ def build_path(start, finish, parent):
         x = parent[x]
         xs.append(x)
     xs.reverse()
-    return xs
+    return xs[1:]
 
 
 # TODO: add memoization

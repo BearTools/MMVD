@@ -39,16 +39,16 @@ def test_neighbors2(warehouse_map1):
 @pytest.mark.utils
 @pytest.mark.pathing
 @pytest.mark.parametrize("start,end,path", [
-    ((4, 4), (0, 0), [(4, 4), (4, 3), (4, 2), (4, 1), (4, 0), (3, 0), (2, 0),
+    ((4, 4), (0, 0), [(4, 3), (4, 2), (4, 1), (4, 0), (3, 0), (2, 0),
                       (1, 0), (0, 0)]),
-    ((0, 0), (1, 2), [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (1, 4), (2, 4),
+    ((0, 0), (1, 2), [(0, 1), (0, 2), (0, 3), (0, 4), (1, 4), (2, 4),
                       (3, 4), (4, 4), (4, 3), (4, 2), (3, 2), (2, 2), (1, 2)]),
-    ((4, 4), (1, 3), [(4, 4), (4, 3), (4, 2), (3, 2), (2, 2), (1, 2), (1, 3)]),
+    ((4, 4), (1, 3), [(4, 3), (4, 2), (3, 2), (2, 2), (1, 2), (1, 3)]),
 ])
 def test_a_star(warehouse_map1, start, end, path):
     """
     Test accuracy and correctness of the A* algorithm.
     """
     length, iterations, final_path = shortest_path(warehouse_map1, start, end)
-    assert length == len(path) - 1
+    assert length == len(path)
     assert final_path == path
