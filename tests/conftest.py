@@ -1,7 +1,7 @@
 # coding: utf-8
 import pytest
 from mmvdApp.utils import (read_warehouse_map, read_robots_positions,
-                           read_order, drop_zone)
+                           read_order, drop_zone, products)
 
 
 @pytest.fixture
@@ -106,3 +106,8 @@ def states1():
         [(0, 3, 4, "a"),  (1, 4, 4, None), (2, 4, 4, None)],
         [(0, 4, 4, "a"),  (1, 4, 4, None), (2, 4, 4, None)],
     ]
+
+
+@pytest.fixture(scope="session")
+def product_positions1(warehouse_map1, order1):
+    return products(warehouse_map1, order1)
