@@ -6,6 +6,26 @@ specific operational research calculations.
 """
 
 
+class RobotCollisionException(Exception):
+    """
+    This exception indicates that in the specific solution steps at least
+    two robots have the same coordinates (!= drop zone) at the same time.
+    """
+    def __init__(self, arg):
+        super(RobotCollisionException, self).__init__()
+        self.arg = arg
+
+
+class InvalidOrderException(Exception):
+    """
+    Raised by :func:`mmvdApp.utils.linprog.valid_solution` when provided
+    solution doesn't bring selected products in specified order.
+    """
+    def __init__(self, arg):
+        super(InvalidOrderException, self).__init__()
+        self.arg = arg
+
+
 def valid_solution(solution, order, dropzone):
     """
     Check validity of a given solution sequence.
@@ -21,12 +41,31 @@ def valid_solution(solution, order, dropzone):
     # TODO: can optimize by checking order on the fly
     for state in solution:
         # check if products are getting dropped
+        positions = []
+        positions_set = set()
+
         for robot, pos_y, pos_x, product in state:
             if (pos_y, pos_x) == dropzone and product:
                 dropped.append(product)
+            if (pos_y, pos_x) != dropzone:
+                positions.append((pos_y, pos_x))
+                positions_set.add((pos_y, pos_x))
+
+        if len(positions) != len(positions_set):
+            number = len(positions) - len(positions_set)
+            diff = set(positions) - positions_set
+            raise RobotCollisionException("%(number)d of robots collide on "
+                                          " positions %(positions)s"
+                                          .format(number=number,
+                                                  positions=diff))
 
     # check if dropped products appear in the same order as they should
-    return dropped == order
+    if dropped != order:
+        raise InvalidOrderException("Products should be provided in this "
+                                    "order: %(order)s, but got %(dropped)s "
+                                    "instead".format(order=order,
+                                                     dropped=dropped))
+    return True
 
 
 def objective_function(states):
