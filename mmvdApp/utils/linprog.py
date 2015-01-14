@@ -12,7 +12,7 @@ class RobotCollisionException(Exception):
     two robots have the same coordinates (!= drop zone) at the same time.
     """
     def __init__(self, arg):
-        super(RobotCollisionException, self).__init__()
+        super(RobotCollisionException, self).__init__(arg)
         self.arg = arg
 
 
@@ -22,7 +22,7 @@ class InvalidOrderException(Exception):
     solution doesn't bring selected products in specified order.
     """
     def __init__(self, arg):
-        super(InvalidOrderException, self).__init__()
+        super(InvalidOrderException, self).__init__(arg)
         self.arg = arg
 
 
@@ -53,16 +53,15 @@ def valid_solution(solution, order, dropzone):
 
         if len(positions) != len(positions_set):
             number = len(positions) - len(positions_set)
-            diff = set(positions) - positions_set
-            raise RobotCollisionException("%(number)d of robots collide on "
-                                          " positions %(positions)s"
+            raise RobotCollisionException("{number} of robots collide on "
+                                          "positions {positions}"
                                           .format(number=number,
-                                                  positions=diff))
+                                                  positions=positions))
 
     # check if dropped products appear in the same order as they should
     if dropped != order:
         raise InvalidOrderException("Products should be provided in this "
-                                    "order: %(order)s, but got %(dropped)s "
+                                    "order: {order}, but got {dropped} "
                                     "instead".format(order=order,
                                                      dropped=dropped))
     return True
