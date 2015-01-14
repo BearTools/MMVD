@@ -34,7 +34,6 @@ def initial_solution(robots, order):
 
 
 # TODO: split this into multiple smaller functions?
-# TODO: better calculation of wait times
 def generate_solution(map_, robot_positions, product_positions, order,
                       dropzone, assignment):
     """
@@ -50,7 +49,6 @@ def generate_solution(map_, robot_positions, product_positions, order,
     :return: states for specific solution
     :rtype: list
     """
-    # distances = {}
     last_iteration_number = []
     routes = []
 
@@ -88,45 +86,42 @@ def generate_solution(map_, robot_positions, product_positions, order,
             if delay_time < 0:
                 delay_time = 0
 
-            while ((routes[-1][delay_time][1], routes[-1][delay_time][2])
-                   == (pos_y, pos_x)):
+            # Anti-collision wait
+            # Check existing states to see if we should wait one iteration more
+            positions = [z[delay_time][1:3] for z in routes
+                         if len(z) > delay_time]
+            while (pos_y, pos_x) in positions:
                 delay_time += 1
+                positions = [z[delay_time][1:3] for z in routes
+                             if len(z) > delay_time]
 
             delay = [(robot_index, pos_y, pos_x, None), ] * delay_time
 
-            # print (product_index,
-            #        last_iteration_number[product_index - 1][1],
-            #        distance1, distance2)
-            # if robot_index == 1:
-            #     print last_iteration_number[product_index - 1][1], distance1,
-            #           distance2
-            #     print last_iteration_number
-
+        # This list holds a value that says:
+        # > robot with `robot_index` will drop the i-th product at the
+        # > `cum_time + delay + d1 + d2`-th state
+        #
+        # This list is used to calculate correct order of robots, for example:
+        #   robot 2 has to wait for robot 1 to bring product A before robot 2
+        #   can bring product B.  Robot 1 route's 6 long, but robot 2 route's
+        #   only 4 long.  The requested products order is: A, B.  Therefore
+        #   robot 2 has to wait for ca. 3 more steps before it dumps off
+        #   product B.
         last_iteration_number.append(
             (robot_index, cumulated_time + delay_time + distance1 + distance2)
         )
 
-        # print product_index, delay_time, distance1, distance2, cumulated_time
-        # print last_iteration_number
-        # print "***************"
-        # distances[product_index] = (len(delay), distance1, distance2)
-
         # Calculate wait time.
-        # Robot waits on assigned product position because it has to get to the
-        # drop zone in specific time.  This means robot cannot outpace any
-        # other robot that should get faster to the drop zone.
+        # Robot can wait on assigned product position because it has to avoid
+        # collisions.  However, for at least a few 1000s of tests it didn't
+        # collide with no waiting.
+        # TODO: test more to see if collisions occurs
         wait = []
-        # if product_index > 0:
-        #     pos_y, pos_x = route1[-1]
-        #     M = distances[product_index - 1] - distances[product_index]
-        #     wait = [(robot_index, pos_y, pos_x, order[product_index]), ] * M
-        #     distances[product_index] = distance1 + distance2 + M
-        # else:
-        #     wait = []
 
         # Convert routes to states
         states1 = [(robot_index, pos_y, pos_x, None)]  # initial position
-        states2 = []
+        states2 = [(robot_index, product_positions[product_index][0],
+                    product_positions[product_index][1], order[product_index])]
         for pos_y, pos_x in route1:
             # Last item in state tuple is reserved for "carried" product.
             # Robot doesn't have the product until it reaches product's
@@ -173,19 +168,25 @@ def neighborhoods(solution):
     """
     # TODO: come up with some neighborhoods
 
-    # randomly select a robot and generate swap with one robot before and one
-    # after
+    # randomly select a robot index and generate swap with index-1 and index+1
     V = len(solution)
-    i = random.choice(range(V))
+    i = random.randrange(V)
     i_1 = (i - 1) % V
     i_2 = (i + 1) % V
     sol1 = solution[:]
-    sol1[i] = solution[i_1]
-    sol1[i_1] = solution[i]
     sol2 = solution[:]
-    sol2[i] = solution[i_2]
-    sol2[i_2] = solution[i]
-    return [sol1, solution, sol2]
+    sol1[i], sol1[i_1] = sol1[i_1], sol1[i]
+    sol2[i], sol2[i_2] = sol2[i_2], sol2[i]
+
+    # randomly change one robot with another
+    i = random.randrange(V)
+    sol3 = solution[:]
+    Y = max(solution)
+    sol3[i] = random.randrange(Y + 1)
+    if sol3[i] == solution[i]:
+        sol3[i] = (solution[i] + 1) % Y
+    return [solution, sol1, sol2, sol3]
+    # return [solution, sol1, sol2]
 
 
 def best_candidate(map_, robot_positions, product_positions, candidates, order,

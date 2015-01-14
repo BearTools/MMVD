@@ -5,6 +5,7 @@ from mmvdApp.visualization import Visualization
 
 
 @pytest.mark.frontend
+@pytest.mark.slow
 def test_magazine_class(warehouse_map1):
     app = Visualization(warehouse_map1)
     robots = ((0, 0), (1, 1), (2, 3), (4, 2))
