@@ -2,8 +2,7 @@
 import pytest
 from mmvdApp.utils.tabu import initial_solution, features, neighborhoods
 from mmvdApp.utils.tabu import generate_solution
-from mmvdApp.utils.linprog import (valid_solution, RobotCollisionException,
-                                   InvalidOrderException)
+from mmvdApp.utils.linprog import valid_solution
 
 
 @pytest.mark.utils
@@ -62,11 +61,10 @@ def test_tabu_yield_valid_solution(warehouse_map1, robots_positions1, order1,
                                    product_positions1, drop_zone1, solution):
     steps = generate_solution(warehouse_map1, robots_positions1,
                               product_positions1, order1, drop_zone1, solution)
-    import pprint
-    pprint.pprint(steps)
-    print len(steps)
+    # import pprint
+    # pprint.pprint(steps)
+    # print len(steps)
     assert valid_solution(steps, order1, drop_zone1)
-    assert 0
 
 
 @pytest.mark.utils

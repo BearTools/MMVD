@@ -39,7 +39,7 @@ def valid_solution(solution, order, dropzone):
     dropped = []  # sequence of products dropped by robots in the drop-zone
 
     # TODO: can optimize by checking order on the fly
-    for state in solution:
+    for state_id, state in enumerate(solution):
         # check if products are getting dropped
         positions = []
         positions_set = set()
@@ -54,8 +54,9 @@ def valid_solution(solution, order, dropzone):
         if len(positions) != len(positions_set):
             number = len(positions) - len(positions_set)
             raise RobotCollisionException("{number} of robots collide on "
-                                          "positions {positions}"
-                                          .format(number=number,
+                                          "positions {positions} on state no. "
+                                          "{id}"
+                                          .format(number=number, id=state_id,
                                                   positions=positions))
 
     # check if dropped products appear in the same order as they should
