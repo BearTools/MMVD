@@ -111,13 +111,6 @@ def generate_solution(map_, robot_positions, product_positions, order,
             (robot_index, cumulated_time + delay_time + distance1 + distance2)
         )
 
-        # Calculate wait time.
-        # Robot can wait on assigned product position because it has to avoid
-        # collisions.  However, for at least a few 1000s of tests it didn't
-        # collide with no waiting.
-        # TODO: test more to see if collisions occurs
-        wait = []
-
         # Convert routes to states
         states1 = [(robot_index, pos_y, pos_x, None)]  # initial position
         states2 = [(robot_index, product_positions[product_index][0],
@@ -132,18 +125,48 @@ def generate_solution(map_, robot_positions, product_positions, order,
         for pos_y, pos_x in route2:
             states2.append((robot_index, pos_y, pos_x, order[product_index]))
 
+        # cumulate states
+        all_states = delay + states1 + states2
+
         # join routes from the same robots
         # Quite common situation is when there are more products in order than
         # robots in warehouse.  Generated solution does not group routes by
         # robot.
-        extended = False
+        robot_appeared = -1
         for k, v in enumerate(routes):
             if v[0][0] == robot_index:
-                extended = True
-                routes[k].extend(delay + states1 + wait + states2)
+                robot_appeared = k
+                all_states = routes[k] + all_states
 
-        if not extended:
-            routes.append(delay + states1 + wait + states2)
+        # Find wait time.
+        # If collisions occur, the robot should wait on its previous position
+        i = 0
+        # L = len(all_states)
+        while i < len(all_states):
+            r_id, pos_y, pos_x, _ = all_states[i]
+
+            # find coords of other robots at the same state
+            coords = [
+                (v[i][1], v[i][2])
+                for k, v in enumerate(routes)
+                if len(routes[k]) > i and v[i][0] != r_id
+            ]
+
+            # check if any previous robot has the same coords at this state
+            if (pos_y, pos_x) != dropzone and (pos_y, pos_x) in coords:
+                # wait to avoid collision
+                all_states.insert(i - 1, all_states[i - 1])
+
+            i += 1
+
+        # Finally add robot routes.
+        # If there are no robots with this ID, simply add to the back;
+        # otherwise re-assign robot routes, because `all_states` has cumulated
+        # robot routes (ie. routes to+from different products)
+        if robot_appeared == -1:
+            routes.append(all_states)
+        else:
+            routes[robot_appeared] = all_states
 
     # to each robot's routes add drop-zone wait
     longest = max(map(len, routes))
