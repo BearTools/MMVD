@@ -17,7 +17,10 @@ _click_path = click.Path(exists=True, dir_okay=False, readable=True,
 @click.argument("warehouse", type=_click_path)
 @click.argument("robots", type=_click_path)
 @click.argument("order", type=_click_path)
-def main(warehouse, robots, order):
+@click.option("--gantt/--no-gantt", default=False,
+              help="whether or not to generate Gantt chart to visualize "
+              "handling order by robots")
+def main(warehouse, robots, order, gantt):
     """
     Start application and load specific warehouse map from WAREHOUSE, load
     initial robots positions from ROBOTS.  Finally load products order from
@@ -27,7 +30,8 @@ def main(warehouse, robots, order):
     """
     return run_application(click.format_filename(warehouse),
                            click.format_filename(robots),
-                           click.format_filename(order))
+                           click.format_filename(order),
+                           gantt)
 
 if __name__ == "__main__":
     main()
