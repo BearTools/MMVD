@@ -290,6 +290,7 @@ def tabu_search(map_, robot_positions, product_positions, order,
              steps (as stated by :func:`mmvdApp.utils.linprog.valid_solution`
              function).
     """
+    # TODO: add these as conf vars
     MAX_ITERATIONS = 10**3
     MAX_TABU_SIZE = 5
     dropzone = drop_zone(map_)
