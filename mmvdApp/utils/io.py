@@ -18,6 +18,10 @@ def process_lines(lines):
 def read_warehouse_map(name):
     """
     Read the file line by line and represent it as an array or list of lists.
+
+    :param string name: path to the warehouse map file
+    :return: immutable map
+    :rtype: tuple
     """
     with open(name, 'r') as f:
         lines = process_lines(f.readlines())
@@ -31,8 +35,9 @@ def read_warehouse_map(name):
             except ValueError:
                 v2_ = v2
             lines[k1][k2] = v2_
+        lines[k1] = tuple(lines[k1])
 
-    return lines
+    return tuple(lines)
 
 
 def read_robots_positions(name):
