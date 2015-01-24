@@ -133,15 +133,19 @@ def generate_solution(map_, robot_positions, product_positions, order,
         # robots in warehouse.  Generated solution does not group routes by
         # robot.
         robot_appeared = -1
+        robot_previous_length = 0
         for k, v in enumerate(routes):
             if v[0][0] == robot_index:
                 robot_appeared = k
                 all_states = routes[k] + all_states
+                robot_previous_length += len(routes[k]) - 1
+                # there should be only one cumulated route for each robot, so
+                # it's save to assume we can break
+                break
 
         # Find wait time.
         # If collisions occur, the robot should wait on its previous position
-        i = 0
-        # L = len(all_states)
+        i = robot_previous_length
         while i < len(all_states):
             r_id, pos_y, pos_x, _ = all_states[i]
 
@@ -266,7 +270,7 @@ def features(previous, current):
 
 
 def tabu_search(map_, robot_positions, product_positions, order,
-                product_distances):
+                product_distances, rounds=10**3, memsize=5):
     """
     Compute best (not necessarily optimal) arrangement (robots → products),
     that is both valid (see :func:`mmvdApp.utils.linprog.valid_solution`) and
@@ -285,14 +289,15 @@ def tabu_search(map_, robot_positions, product_positions, order,
                                    ``(to, from)`` the product on the map.
                                    Starting point is always dropzone, so is
                                    ending point.
+    :param int rounds: number of loop iterations
+    :param int memsize: number of taboo items to be held in short-term memory
     :return: a pair, ``result`` and ``solution``.  ``result`` carries best
              objective function value.  ``solution`` provides valid solution
              steps (as stated by :func:`mmvdApp.utils.linprog.valid_solution`
              function).
     """
-    # TODO: add these as conf vars
-    MAX_ITERATIONS = 10**3
-    MAX_TABU_SIZE = 5
+    MAX_ITERATIONS = rounds
+    MAX_TABU_SIZE = memsize
     dropzone = drop_zone(map_)
 
     solution = initial_solution(range(len(robot_positions)), order)

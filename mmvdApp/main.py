@@ -1,4 +1,7 @@
 # coding: utf-8
+import tempfile
+from multiprocessing import Process
+
 from .utils.io import read_warehouse_map, read_robots_positions, read_order
 from .utils.map import drop_zone, products, distances
 from .utils.tabu import tabu_search
@@ -7,7 +10,7 @@ from .charts import gantt_values, gantt_chart
 
 
 def run_application(warehouse_filename, robots_filename, order_filename,
-                    gantt):
+                    gantt, tabu_rounds, tabu_memory):
     """
     Start application.
 
@@ -24,25 +27,40 @@ def run_application(warehouse_filename, robots_filename, order_filename,
 
     product_positions = products(map_, order)
 
-    # calculate distances
+    # calculate distances from dropzone to products and back
     drop_zone_coords = drop_zone(map_)
     product_distances = distances(map_, product_positions,
                                   start_pos=drop_zone_coords,
                                   end_pos=drop_zone_coords)
 
     # start tabu loop
-
     print "Starting Tabu Search. This may take a while…"
-    result, solution, steps = tabu_search(map_, robot_positions,
-                                          product_positions, order,
-                                          product_distances)
+    result, solution, steps = tabu_search(
+        map_, robot_positions, product_positions, order,
+        product_distances,
+        rounds=tabu_rounds, memsize=tabu_memory
+    )
 
-    # representing results
+    # show Gantt chart for the best solution
+    graph_proc = None
+    if gantt:
+
+        file_, fname = tempfile.mkstemp(suffix=".png")
+        print "Generating Gantt chart…"
+        gantt_data = gantt_values(steps, drop_zone_coords)
+
+        # run this in subprocess to show the chart in a non-blocking way
+        # (`plt.show(block=False)` didn't work)
+        graph_proc = Process(target=gantt_chart, args=(gantt_data, ),
+                             kwargs=dict(savename=fname, show=True))
+        graph_proc.start()
+
+    # handle GUI for representing robots animation
     gui = Visualization(map_)
 
     gui.draw_robots(robot_positions)
     for k, step in enumerate(steps):
-        print "Step", k
+        # print "Step", k  # TODO: drop this counter into GUI
         robots_update = []
         shelves_update = []
         for robot_id, pos_y, pos_x, product in step:
@@ -60,8 +78,5 @@ def run_application(warehouse_filename, robots_filename, order_filename,
 
     gui.end()  # TODO: misleading function name, should be "loop" or sth
 
-    # show Gantt chart for the best solution
-    if gantt:
-        print "Generating Gantt chart…"
-        gantt_data = gantt_values(steps, drop_zone_coords)
-        gantt_chart(gantt_data)
+    if graph_proc and gantt:
+        graph_proc.join()

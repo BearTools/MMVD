@@ -34,7 +34,7 @@ def gantt_values(states, dropzone):
     return data
 
 
-def gantt_chart(data):
+def gantt_chart(data, savename=None, show=False):
     """
     Generate Gantt chart.
 
@@ -63,4 +63,9 @@ def gantt_chart(data):
     plt.yticks(range(len(data.keys())))
     plt.legend()
 
-    plt.show()
+    if savename:
+        plt.savefig(savename)
+    if show:
+        plt.show()
+
+    return True

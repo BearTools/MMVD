@@ -73,7 +73,7 @@ def test_tabu_yield_valid_solution(warehouse_map1, robots_positions1, order1,
 @pytest.mark.random
 @pytest.mark.benchmark(
     group="random-solution-validness",
-    min_rounds=10000,
+    min_rounds=1000,
     warmup=False,
 )
 @pytest.mark.slow
