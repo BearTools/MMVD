@@ -49,6 +49,7 @@ def test_a_star(warehouse_map1, start, end, path):
     """
     Test accuracy and correctness of the A* algorithm.
     """
-    length, iterations, final_path = shortest_path(warehouse_map1, start, end)
-    assert length == len(path)
+    distance, iterations, final_path = shortest_path(warehouse_map1, start,
+                                                     end)
+    assert distance == len(path)
     assert final_path == path
