@@ -3,6 +3,7 @@ import itertools
 import collections
 import heapq
 import random
+import logging
 
 from .linprog import objective_function, valid_solution
 from .linprog import RobotCollisionException, InvalidOrderException
@@ -228,6 +229,7 @@ def best_candidate(map_, robot_positions, product_positions, candidates, order,
         try:
             if valid_solution(solution, order, dropzone):
                 objective = objective_function(solution)
+                logging.debug("Objective function: %d", objective)
                 heapq.heappush(rv, (objective, candidate, solution))
         except (RobotCollisionException, InvalidOrderException):
             pass
@@ -287,12 +289,12 @@ def tabu_search(map_, robot_positions, product_positions, order,
     solution = initial_solution(range(len(robot_positions)), order)
     best_solution = solution[:]  # copy of solution
 
-    result = objective_function(solution)
-    best_result = result
-
     best_solution_steps = generate_solution(map_, robot_positions,
                                             product_positions, order, dropzone,
                                             best_solution)
+
+    result = objective_function(best_solution_steps)
+    best_result = result
 
     tabu_list = collections.deque(maxlen=MAX_TABU_SIZE)
 

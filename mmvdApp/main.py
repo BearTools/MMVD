@@ -11,7 +11,7 @@ from .charts import gantt_values, gantt_chart
 
 
 def run_application(warehouse_filename, robots_filename, order_filename,
-                    gantt, gui, tabu_rounds, tabu_memory):
+                    gantt, gui, summary, tabu_rounds, tabu_memory):
     """
     Start application.
 
@@ -81,6 +81,11 @@ def run_application(warehouse_filename, robots_filename, order_filename,
             frontend.animate(robots_update, shelves_update)
 
         frontend.end()  # TODO: misleading function name, should be "loop"
+
+    if summary:
+        logging.info("Order was: %s", order)
+        logging.info("Best solution is: %s", solution)
+        logging.info("Objective function value is: %d", result)
 
     if graph_proc and gantt:
         graph_proc.join()

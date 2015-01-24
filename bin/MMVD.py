@@ -17,19 +17,21 @@ _click_path = click.Path(exists=True, dir_okay=False, readable=True,
               "handling order by robots")
 @click.option("--gui/--no-gui", default=True,
               help="whether or not to visualize robot movements in Tk GUI")
+@click.option("--summary/--no-summary", default=True,
+              help="whether or not to show best solution")
 @click.option("--tabu-rounds", default=10**3, help="number of Tabu iterations")
 @click.option("--tabu-memory", default=5,
               help="number of Tabu items held in short-term memory")
 @click.option("--verbose/--no-verbose", default=False,
               help="how loud should the program output be")
-def main(warehouse, robots, order, gantt, gui, tabu_rounds, tabu_memory,
-         verbose):
+def main(warehouse, robots, order, gantt, gui, summary, tabu_rounds,
+         tabu_memory, verbose):
     """
     Start application and load specific warehouse map from WAREHOUSE, load
     initial robots positions from ROBOTS.  Finally load products order from
     ORDER.
 
-    All paths must be readable, existing files.
+    All paths must point to readable, existing files.
     """
     # if verbose, allow DEBUG, too
     verbosity_level = 10 if verbose else 20
@@ -39,7 +41,7 @@ def main(warehouse, robots, order, gantt, gui, tabu_rounds, tabu_memory,
     return run_application(click.format_filename(warehouse),
                            click.format_filename(robots),
                            click.format_filename(order),
-                           gantt, gui, tabu_rounds, tabu_memory)
+                           gantt, gui, summary, tabu_rounds, tabu_memory)
 
 if __name__ == "__main__":
     main()
