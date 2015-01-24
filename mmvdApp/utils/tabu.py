@@ -49,7 +49,7 @@ def generate_solution(map_, robot_positions, product_positions, order,
     :return: states for specific solution
     :rtype: list
     """
-    last_iteration_number = []
+    drop_off_step = []
     routes = []
 
     # for each robot at each starting position generate route to the assigned
@@ -74,80 +74,63 @@ def generate_solution(map_, robot_positions, product_positions, order,
         delay_time = 0
         delay = []
 
-        cumulated_time = 0
-        for r_id, t in last_iteration_number:
-            if r_id == robot_index:
-                cumulated_time = t + 1
-
-        if product_index > 0:
-            _, delay_time = last_iteration_number[product_index - 1]
-            delay_time += 1
-            delay_time -= cumulated_time + distance1 + distance2
-            if delay_time < 0:
-                delay_time = 0
-
-            # Anti-collision wait
-            # Check existing states to see if we should wait one iteration more
-            positions = [z[delay_time][1:3] for z in routes
-                         if len(z) > delay_time]
-            while (pos_y, pos_x) in positions:
-                delay_time += 1
-                positions = [z[delay_time][1:3] for z in routes
-                             if len(z) > delay_time]
-
-            delay = [(robot_index, pos_y, pos_x, None), ] * delay_time
-
-        # This list holds a value that says:
-        # > robot with `robot_index` will drop the i-th product at the
-        # > `cum_time + delay + d1 + d2`-th state
-        #
-        # This list is used to calculate correct order of robots, for example:
-        #   robot 2 has to wait for robot 1 to bring product A before robot 2
-        #   can bring product B.  Robot 1 route's 6 long, but robot 2 route's
-        #   only 4 long.  The requested products order is: A, B.  Therefore
-        #   robot 2 has to wait for ca. 3 more steps before it dumps off
-        #   product B.
-        last_iteration_number.append(
-            (robot_index, cumulated_time + delay_time + distance1 + distance2)
-        )
-
         # Convert routes to states
+        # here are first-states that get cut off from a_star, so I add them
+        # manually
         states1 = [(robot_index, pos_y, pos_x, None)]  # initial position
-        states2 = [(robot_index, product_positions[product_index][0],
-                    product_positions[product_index][1], order[product_index])]
-        for pos_y, pos_x in route1:
+        states2 = []
+
+        for pos_y_, pos_x_ in route1:
             # Last item in state tuple is reserved for "carried" product.
             # Robot doesn't have the product until it reaches product's
             # position
-            if product_positions[product_index] != (pos_y, pos_x):
-                states1.append((robot_index, pos_y, pos_x, None))
+            if product_positions[product_index] != (pos_y_, pos_x_):
+                states1.append((robot_index, pos_y_, pos_x_, None))
 
-        for pos_y, pos_x in route2:
-            states2.append((robot_index, pos_y, pos_x, order[product_index]))
-
-        # cumulate states
-        all_states = delay + states1 + states2
+        for pos_y_, pos_x_ in route2:
+            states2.append((robot_index, pos_y_, pos_x_, order[product_index]))
 
         # join routes from the same robots
         # Quite common situation is when there are more products in order than
         # robots in warehouse.  Generated solution does not group routes by
         # robot.
         robot_appeared = -1
-        robot_previous_length = 0
+        robot_previous_time = 0
         for k, v in enumerate(routes):
             if v[0][0] == robot_index:
                 robot_appeared = k
-                all_states = routes[k] + all_states
-                robot_previous_length += len(routes[k]) - 1
+                robot_previous_time += len(routes[k]) - 1
                 # there should be only one cumulated route for each robot, so
                 # it's save to assume we can break
                 break
 
+        # Calculate wait time at the product's site.  This enforces robots to
+        # always drop products off in the requested order.
+        # We don't want to drop the product earlier than the previous
+        # product has been dropped off.
+        wait = [(robot_index, product_positions[product_index][0],
+                product_positions[product_index][1], order[product_index])]
+        if product_index:
+            # formula is:
+            # previous robot drop off time - \
+            #  (current robot all routes + delay + states1 + states2)
+            wait_time = drop_off_step[-1] - (robot_previous_time +
+                                             delay_time + distance1 +
+                                             distance2)
+            if wait_time > 0:
+                wait += wait * wait_time
+
+        # cumulate states
+        all_states = delay + states1 + wait + states2
+
+        if robot_appeared > -1:
+            all_states = routes[k] + all_states
+
         # Find wait time.
         # If collisions occur, the robot should wait on its previous position
-        i = robot_previous_length
+        i = robot_previous_time
         while i < len(all_states):
-            r_id, pos_y, pos_x, _ = all_states[i]
+            r_id, pos_y_, pos_x_, _ = all_states[i]
 
             # find coords of other robots at the same state
             coords = [
@@ -157,7 +140,7 @@ def generate_solution(map_, robot_positions, product_positions, order,
             ]
 
             # check if any previous robot has the same coords at this state
-            if (pos_y, pos_x) != dropzone and (pos_y, pos_x) in coords:
+            if (pos_y_, pos_x_) != dropzone and (pos_y_, pos_x_) in coords:
                 # wait to avoid collision
                 all_states.insert(i - 1, all_states[i - 1])
 
@@ -171,6 +154,9 @@ def generate_solution(map_, robot_positions, product_positions, order,
             routes.append(all_states)
         else:
             routes[robot_appeared] = all_states
+
+        # mark what states is the drop-off taking place
+        drop_off_step.append(len(all_states) - 1)
 
     # to each robot's routes add drop-zone wait
     longest = max(map(len, routes))
@@ -193,8 +179,6 @@ def neighborhoods(solution):
     :return: possible permutations of current solution
     :rtype: list
     """
-    # TODO: come up with some neighborhoods
-
     # randomly select a robot index and generate swap with index-1 and index+1
     V = len(solution)
     i = random.randrange(V)
