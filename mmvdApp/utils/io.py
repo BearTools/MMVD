@@ -64,4 +64,4 @@ def read_order(name):
     """
     with open(name, 'r') as f:
         lines = process_lines(f.readlines())
-    return lines
+    return tuple(lines)

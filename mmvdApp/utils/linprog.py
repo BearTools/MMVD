@@ -60,7 +60,7 @@ def valid_solution(solution, order, dropzone):
                                                   positions=positions))
 
     # check if dropped products appear in the same order as they should
-    if dropped != order:
+    if tuple(dropped) != order:
         raise InvalidOrderException("Products should be provided in this "
                                     "order: {order}, but got {dropped} "
                                     "instead".format(order=order,
