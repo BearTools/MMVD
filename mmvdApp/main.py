@@ -11,7 +11,7 @@ from .charts import gantt_values, gantt_chart
 
 
 def run_application(warehouse_filename, robots_filename, order_filename,
-                    gantt, tabu_rounds, tabu_memory):
+                    gantt, gui, tabu_rounds, tabu_memory):
     """
     Start application.
 
@@ -57,29 +57,30 @@ def run_application(warehouse_filename, robots_filename, order_filename,
         graph_proc.start()
 
     # handle GUI for representing robots animation
-    gui = Visualization(map_)
+    if gui:
+        frontend = Visualization(map_)
 
-    gui.draw_robots(robot_positions)
-    for k, step in enumerate(steps):
-        # TODO: drop step counter into GUI
-        logging.debug("Step %d", k)
+        frontend.draw_robots(robot_positions)
+        for k, step in enumerate(steps):
+            # TODO: drop step counter into GUI
+            logging.debug("Step %d", k)
 
-        robots_update = []
-        shelves_update = []
-        for robot_id, pos_y, pos_x, product in step:
-            if (pos_y, pos_x) != drop_zone_coords:
-                robots_update.append((robot_id, (pos_y, pos_x)))
-                if product:
-                    shelves_update.append((product, (pos_y, pos_x)))
-            else:
-                pass
-                robots_update.append((robot_id, 0))  # hide the robot
-                if product:
-                    shelves_update.append((product, 0))  # and hide the shelf
+            robots_update = []
+            shelves_update = []
+            for robot_id, pos_y, pos_x, product in step:
+                if (pos_y, pos_x) != drop_zone_coords:
+                    robots_update.append((robot_id, (pos_y, pos_x)))
+                    if product:
+                        shelves_update.append((product, (pos_y, pos_x)))
+                else:
+                    pass
+                    robots_update.append((robot_id, 0))  # hide the robot
+                    if product:
+                        shelves_update.append((product, 0))  # hide the shelf
 
-        gui.animate(robots_update, shelves_update)
+            frontend.animate(robots_update, shelves_update)
 
-    gui.end()  # TODO: misleading function name, should be "loop" or sth
+        frontend.end()  # TODO: misleading function name, should be "loop"
 
     if graph_proc and gantt:
         graph_proc.join()
