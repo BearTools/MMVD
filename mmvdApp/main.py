@@ -1,4 +1,5 @@
 # coding: utf-8
+import logging
 import tempfile
 from multiprocessing import Process
 
@@ -34,7 +35,7 @@ def run_application(warehouse_filename, robots_filename, order_filename,
                                   end_pos=drop_zone_coords)
 
     # start tabu loop
-    print "Starting Tabu Search. This may take a while…"
+    logging.info("Starting Tabu Search. This may take a while…")
     result, solution, steps = tabu_search(
         map_, robot_positions, product_positions, order,
         product_distances,
@@ -46,7 +47,7 @@ def run_application(warehouse_filename, robots_filename, order_filename,
     if gantt:
 
         file_, fname = tempfile.mkstemp(suffix=".png")
-        print "Generating Gantt chart…"
+        logging.info("Generating Gantt chart…")
         gantt_data = gantt_values(steps, drop_zone_coords)
 
         # run this in subprocess to show the chart in a non-blocking way
@@ -60,7 +61,9 @@ def run_application(warehouse_filename, robots_filename, order_filename,
 
     gui.draw_robots(robot_positions)
     for k, step in enumerate(steps):
-        # print "Step", k  # TODO: drop this counter into GUI
+        # TODO: drop step counter into GUI
+        logging.debug("Step %d", k)
+
         robots_update = []
         shelves_update = []
         for robot_id, pos_y, pos_x, product in step:

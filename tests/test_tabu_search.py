@@ -61,9 +61,6 @@ def test_tabu_yield_valid_solution(warehouse_map1, robots_positions1, order1,
                                    product_positions1, drop_zone1, solution):
     steps = generate_solution(warehouse_map1, robots_positions1,
                               product_positions1, order1, drop_zone1, solution)
-    # import pprint
-    # pprint.pprint(steps)
-    # print len(steps)
     assert valid_solution(steps, order1, drop_zone1)
 
 
@@ -85,12 +82,7 @@ def test_tabu_yield_valid_solution_random(
     def loop():
         for neighbor in neighborhoods(initial_solution1):
             if neighbor != initial_solution1:
-                # print "************"
-                # print neighbor
                 steps = generate_solution(warehouse_map1, robots_positions1,
                                           product_positions1, order1,
                                           drop_zone1, neighbor)
-                # import pprint
-                # pprint.pprint(steps)
-                # print len(steps)
                 assert valid_solution(steps, order1, drop_zone1)

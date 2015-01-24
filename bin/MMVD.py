@@ -7,6 +7,7 @@
 # 3 load order
 
 import click
+import logging
 from mmvdApp.main import run_application
 
 _click_path = click.Path(exists=True, dir_okay=False, readable=True,
@@ -20,10 +21,12 @@ _click_path = click.Path(exists=True, dir_okay=False, readable=True,
 @click.option("--gantt/--no-gantt", default=True,
               help="whether or not to generate Gantt chart to visualize "
               "handling order by robots")
-@click.option("--tabu-rounds", default=10**3, help="Number of Tabu iterations")
+@click.option("--tabu-rounds", default=10**3, help="number of Tabu iterations")
 @click.option("--tabu-memory", default=5,
-              help="Number of Tabu items held in short-term memory")
-def main(warehouse, robots, order, gantt, tabu_rounds, tabu_memory):
+              help="number of Tabu items held in short-term memory")
+@click.option("--verbose/--no-verbose", default=False,
+              help="how loud should the program output be")
+def main(warehouse, robots, order, gantt, tabu_rounds, tabu_memory, verbose):
     """
     Start application and load specific warehouse map from WAREHOUSE, load
     initial robots positions from ROBOTS.  Finally load products order from
@@ -31,6 +34,11 @@ def main(warehouse, robots, order, gantt, tabu_rounds, tabu_memory):
 
     All paths must be readable, existing files.
     """
+    # if verbose, allow DEBUG, too
+    verbosity_level = 10 if verbose else 20
+    logging.basicConfig(format='%(levelname)s: %(message)s',
+                        level=verbosity_level)
+
     return run_application(click.format_filename(warehouse),
                            click.format_filename(robots),
                            click.format_filename(order),
