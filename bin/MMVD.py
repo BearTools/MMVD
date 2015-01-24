@@ -1,11 +1,5 @@
 #!/usr/bin/env python
 # coding: utf-8
-
-# start application:
-# 1 load specified map
-# 2 load robots selection
-# 3 load order
-
 import click
 import logging
 from mmvdApp.main import run_application

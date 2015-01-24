@@ -1,5 +1,4 @@
 # coding: utf-8
-import numpy as np
 
 
 def remove_line_ending(line):
@@ -16,7 +15,7 @@ def process_lines(lines):
     return lines
 
 
-def read_warehouse_map(name, use_numpy=False):
+def read_warehouse_map(name):
     """
     Read the file line by line and represent it as an array or list of lists.
     """
@@ -32,11 +31,6 @@ def read_warehouse_map(name, use_numpy=False):
             except ValueError:
                 v2_ = v2
             lines[k1][k2] = v2_
-
-    if use_numpy:
-        # CAUTION: Numpy arrays don't support mixed ints and chars, there's
-        #          gonna be all characters.
-        lines = np.array(lines)
 
     return lines
 

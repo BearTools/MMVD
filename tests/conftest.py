@@ -14,7 +14,7 @@ def warehouse_map1(tmpdir):
 """
     file_ = tmpdir.join("warehouse1.map")
     file_.write(content)
-    return read_warehouse_map(str(file_), use_numpy=False)
+    return read_warehouse_map(str(file_))
 
 
 @pytest.fixture
