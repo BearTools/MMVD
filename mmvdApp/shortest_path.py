@@ -1,6 +1,7 @@
 # coding: utf-8
 import heapq
 import logging
+from .utils.memoization import memoize
 
 
 class PathUnreachable(Exception):
@@ -145,7 +146,7 @@ def build_path(start, finish, parent):
     return xs[1:]
 
 
-# TODO: add memoization
+@memoize
 def a_star(map_, start_position, end_position, only_distance=False):
     """
     Find shortest path from ``start_position`` to ``end_position`` on the
