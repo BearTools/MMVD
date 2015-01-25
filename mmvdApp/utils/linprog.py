@@ -1,4 +1,5 @@
 # coding: utf-8
+from .memoization import memoize
 
 """
 LinProg stands for Linear Programming.  Functions defined here are intended for
@@ -26,6 +27,7 @@ class InvalidOrderException(Exception):
         self.arg = arg
 
 
+@memoize
 def valid_solution(solution, order, dropzone):
     """
     Check validity of a given solution sequence.

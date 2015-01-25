@@ -227,7 +227,8 @@ def best_candidate(map_, robot_positions, product_positions, candidates, order,
         solution = generate_solution(map_, robot_positions, product_positions,
                                      order, dropzone, candidate)
         try:
-            if valid_solution(solution, order, dropzone):
+            # converting to immutable tuple so that memoize can handle it
+            if valid_solution(tuple(solution), order, dropzone):
                 objective = objective_function(solution)
                 logging.debug("Objective function: %d", objective)
                 heapq.heappush(rv, (objective, candidate, solution))
