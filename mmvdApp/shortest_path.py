@@ -150,7 +150,7 @@ def build_path(start, finish, parent):
 def a_star(map_, start_position, end_position, only_distance=False):
     """
     Find shortest path from ``start_position`` to ``end_position`` on the
-    ``map_`` using A* (http://en.wikipedia.org/wiki/A*) algorithm.
+    ``map_`` using `A* <http://en.wikipedia.org/wiki/A*>`_ algorithm.
 
     Adapted from:
     http://dave.dkjones.org/posts/2012/2012-03-12-astar-python.html
@@ -161,6 +161,7 @@ def a_star(map_, start_position, end_position, only_distance=False):
     :param bool only_distance: return only a distance between start position
                                and end position
     :return: distance, iteration steps and actual path to the destination
+    :rtype: tuple
     :raises PathUnreachable: if the algorithm is not able to find a path to the
                              destination
     """

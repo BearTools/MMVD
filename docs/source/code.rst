@@ -21,12 +21,19 @@ Visualization module
 .. automodule:: mmvdApp.visualization
   :members:
 
+Charts generating module
+------------------------
+
+.. automodule:: mmvdApp.charts
+  :members:
 
 Pathing module
 --------------
 
 .. automodule:: mmvdApp.shortest_path
   :members:
+
+  .. autofunction:: mmvdApp.shortest_path.a_star(map_, start_position, end_position, only_distance=False)
 
 Utils package
 -------------
