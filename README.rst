@@ -1,6 +1,10 @@
 MMVD: a robot controlled warehouse simulator
 ============================================
 
+.. image:: https://readthedocs.org/projects/mmvd/badge/?version=latest
+  :target: https://readthedocs.org/projects/mmvd/?badge=latest
+  :alt: Documentation Status
+
 This application is a real-life example of operational research algorithms
 implementation.
 
