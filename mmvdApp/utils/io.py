@@ -2,14 +2,38 @@
 
 
 def remove_line_ending(line):
+    """
+    Strip line from the RHS end.
+
+    :param str line: line to be stripped
+    :return: stripped line
+    :rtype: str
+    """
     return line.rstrip()
 
 
 def filter_out_empty(line):
+    """
+    Filter used to determinate if line is not empty.
+
+    :param str line: line to be tested
+    :return: length of the line; for non-empty lines this returns value greater
+             than zero, which evaluates to boolean ``True``
+    :rtype: int
+    """
     return len(line)
 
 
 def process_lines(lines):
+    """
+    Filter and alter a list of lines (for example from a file).  This function
+    is used for initial processing of input files.
+
+    :param list lines: lines to be stripped and filtered out
+    :return: the same line without line-ending white characters. Additionally
+             empty lines get dropped.
+    :rtype: list
+    """
     lines = map(remove_line_ending, lines)  # get rid of line endings
     lines = filter(filter_out_empty, lines)  # get rid of empty lines
     return lines
@@ -44,6 +68,10 @@ def read_robots_positions(name):
     """
     Read a file declaring number of robots and their starting positions.  All
     robots can start from the same position.
+
+    :param string name: path to the file with robot initial positions
+    :return: list of pairs (y, x)
+    :rtype: list
     """
     with open(name, 'r') as f:
         lines = process_lines(f.readlines())
@@ -61,6 +89,10 @@ def read_order(name):
     """
     Read a file with products sequence.  This sequence is important: our robots
     have to bring products to the drop zone in this exact sequence.
+
+    :param string name: path to the file requested order
+    :return: requested order sequence
+    :rtype: tuple
     """
     with open(name, 'r') as f:
         lines = process_lines(f.readlines())
