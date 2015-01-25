@@ -53,6 +53,12 @@ Map helpers
 .. automodule:: mmvdApp.utils.map
   :members:
 
+Memoization decorator
+~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: mmvdApp.utils.memoization
+  :members:
+
 Tabu search module
 ~~~~~~~~~~~~~~~~~~
 

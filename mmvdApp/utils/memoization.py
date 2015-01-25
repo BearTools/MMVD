@@ -14,9 +14,10 @@ class memoize:
 
         wrapped = memoize(other_dummy_function)
 
-    **CAUTION:** it's important to only use this decorator for functions with
-    immutable arguments.  Do not pass lists or sets to this function; use
-    tuples or frozensets instead!
+    .. warning::
+        It's important to only use this decorator for functions with
+        immutable arguments.  Do not pass lists or sets to that function; use
+        tuples or frozensets instead!
     """
 
     def __init__(self, fn):
