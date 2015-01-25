@@ -1,5 +1,5 @@
 # coding: utf-8
-# import inspect
+import functools
 
 
 class memoize:
@@ -22,6 +22,7 @@ class memoize:
     def __init__(self, fn):
         self.fn = fn
         self.memory = {}
+        functools.update_wrapper(self, fn)
 
     def __call__(self, *args, **kwargs):
         """

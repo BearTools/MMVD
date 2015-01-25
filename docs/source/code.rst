@@ -45,6 +45,8 @@ Linear programming module
 .. automodule:: mmvdApp.utils.linprog
   :members:
 
+  .. autofunction:: mmvdApp.utils.linprog.valid_solution(solution, order, dropzone)
+
 Map helpers
 ~~~~~~~~~~~
 

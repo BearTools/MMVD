@@ -35,12 +35,11 @@ def valid_solution(solution, order, dropzone):
     Solution is valid if and only if products are dropped in drop-zone in order
     specified by parameter `order`.
 
-    :rtype: boolean
+    :rtype: bool
     :return: check if solution is valid
     """
     dropped = []  # sequence of products dropped by robots in the drop-zone
 
-    # TODO: can optimize by checking order on the fly
     for state_id, state in enumerate(solution):
         # check if products are getting dropped
         positions = []
@@ -80,7 +79,9 @@ def objective_function(states):
     be a valid solution if at the end all required products were carried by
     robots to their drop zone.
 
-    **WARNING**: this function does **not** check solution for validity.
+    .. warning::
+        This function does **not** check solution for validity.  Use
+        :func:`mmvdApp.utils.linprog.valid_solution` instead.
 
     :param states: a sequence of application states
     :rtype: int

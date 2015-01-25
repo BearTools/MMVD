@@ -21,3 +21,5 @@ def test_memoization():
 
     assert memoized(argument) != unmemoizable_function(argument)
     assert set(memoized(argument)) == set(letters)
+    assert isinstance(memoized, memoize)
+    assert memoized.__doc__ is unmemoizable_function.__doc__
