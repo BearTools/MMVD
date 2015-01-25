@@ -278,10 +278,11 @@ def tabu_search(map_, robot_positions, product_positions, order,
                                    ending point.
     :param int rounds: number of loop iterations
     :param int memsize: number of taboo items to be held in short-term memory
-    :return: a pair, ``result`` and ``solution``.  ``result`` carries best
-             objective function value.  ``solution`` provides valid solution
-             steps (as stated by :func:`mmvdApp.utils.linprog.valid_solution`
-             function).
+    :return: a tuple, ``result``, ``solution`` and ``solution_steps``.
+             ``result`` carries best objective function value.  ``solution``
+             provides valid solution (as stated by
+             :func:`mmvdApp.utils.linprog.valid_solution` function), and
+             ``solution_steps`` gives you states for whole simulation.
     """
     MAX_ITERATIONS = rounds
     MAX_TABU_SIZE = memsize
@@ -317,7 +318,7 @@ def tabu_search(map_, robot_positions, product_positions, order,
             previous_solution = best_solution[:]
             best_solution = solution[:]
             best_result = result
-            best_solution_steps = steps[:]
+            best_solution_steps = steps
 
             tabu_list.append(features(previous_solution, solution))
 

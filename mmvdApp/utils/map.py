@@ -9,8 +9,8 @@ def drop_zone(map):
     Find the drop zone coordinates.
 
     :param array map: a warehouse map
-    :return: coordinates of the drop zone
-    :rtype: pair ``(y, x)``
+    :return: coordinates ``(y, x)`` of the drop zone
+    :rtype: tuple
     """
     dz = (-1, -1)
 
@@ -29,9 +29,9 @@ def products(map, order):
 
     :param array map: a warehouse map
     :param list order: a specific sequence of products
-    :return: coordinates for products in the same sequence as they are
-             specified in ``order``
-    :rtype: list of pairs ``(y, x)``
+    :return: list of ``(y, x)``coordinates for products in the same sequence as
+             they are specified in ``order``
+    :rtype: list
     """
     # CAUTION:
     # Make sure to return coordinates in the same order as corresponding
@@ -64,9 +64,9 @@ def distances(map, points, start_pos, end_pos):
                         ``[(0, 1), (1, 1), ...]``
     :param tuple start_pos: tuple with route beginning point: ``(y, x)``
     :param tuple end_pos: tuple with route beginning point: ``(y, x)``
-    :rtype: list of pairs
-    :return: list of tuples with distances from parameter ``start_pos`` to each
-             point and from each point to parameter ``end_pos``
+    :rtype: list
+    :return: list of tuples with distances from ``start_pos`` to each
+             point and from each point to ``end_pos``
     """
     d = []
     for point in points:
