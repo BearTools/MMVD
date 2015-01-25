@@ -55,6 +55,9 @@ Installation
 
 It should now be installed.
 
+For more advanced installation instructions please follow
+:ref:`installation_long`.
+
 Development
 -----------
 
@@ -76,7 +79,15 @@ in your system::
       initial robots positions from ROBOTS.  Finally load products order from
       ORDER.
 
-      All paths must be readable, existing files.
+      All paths must point to readable, existing files.
 
     Options:
-      --help  Show this message and exit.
+      --gantt / --no-gantt      whether or not to generate Gantt chart to
+                                visualize handling order by robots
+      --gui / --no-gui          whether or not to visualize robot movements in Tk
+                                GUI
+      --summary / --no-summary  whether or not to show best solution
+      --tabu-rounds INTEGER     number of Tabu iterations
+      --tabu-memory INTEGER     number of Tabu items held in short-term memory
+      --verbose / --no-verbose  how loud should the program output be
+      --help                    Show this message and exit.
