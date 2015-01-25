@@ -28,14 +28,11 @@ class PyTest(TestCommand):
 
 readme = open('README.rst').read()
 requirements = open('requirements.txt').readlines()
-# requirements = """
-# pytest==2.6.3
-# """
 
 
 setup(
     name='mmvdApp',
-    version='0.2.0',
+    version='0.4.0',
 
     description='A robot-controlled warehouse simulator',
     long_description=readme,
